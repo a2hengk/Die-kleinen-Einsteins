@@ -12,11 +12,9 @@
     border-radius: 10px;
 }
 
-.create-button {
-    width: 100%;
-    height: 100%;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 40px;
+.karteikarte:hover {
+    background-color: #f77979;
+    width: 220px;
+    height: 170px;
+    transition: 100ms;
 }
