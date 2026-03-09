@@ -1,0 +1,44 @@
+.sidebar {
+  position: absolute;
+  left: 40px;
+  top: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.item:hover {
+  transform: scale(1.1);
+}
+
+.icon {
+  width: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.number {
+  color: #444;
+}
+
+.info_container {
+  display: flex;
+  justify-content: center;
+  margin: 35px 0;
+}
+.info_text {
+  margin: 15px;
+}
+
+

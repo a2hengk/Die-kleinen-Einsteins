@@ -1,0 +1,15 @@
+.container{
+    max-width: 550px;
+    margin: 0 auto;
+}
+.header{
+    display: flex;
+    justify-content: space-between;
+    margin: 1.5rem;
+}
+.action_info{
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}

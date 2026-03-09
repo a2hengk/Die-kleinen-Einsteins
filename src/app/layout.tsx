@@ -1,9 +1,14 @@
 import styles from "./layout.module.css";
+import { Roboto } from "next/font/google";
 import type { Metadata } from "next";
-import { Navbar } from "@/components/layout/navbar/navbar";
-import { Footer } from "@/components/layout/footer/footer";
 
 const { SITE_NAME } = process.env;
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -24,10 +29,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={styles.body}>
-        <Navbar />
+      <body className={`${styles.body} ${roboto.className}`}>
         <main className={styles.main}>{children}</main>
-        <Footer />
       </body>
     </html>
   );

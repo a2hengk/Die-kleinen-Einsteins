@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import styles from "./navbar.module.css";
 import Link from "next/link";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button/button";
 
 export function Navbar() {
@@ -22,7 +23,7 @@ export function Navbar() {
       <nav className={styles.navbar}>
         <div className={styles.left}>
           <button className={styles.burger} onClick={() => setOpen(!open)}>
-            ☰
+            <Menu />
           </button>
 
           <span className={styles.logo}>Logo</span>
@@ -36,7 +37,7 @@ export function Navbar() {
         </div>
 
         <div className={styles.right}>
-          <Button text="Sign up"></Button>
+          <Button content="Sign up"></Button>
         </div>
       </nav>
 
