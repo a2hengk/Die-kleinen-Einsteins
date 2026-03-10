@@ -3,24 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "BASE_PATH=\"\" next dev --turbopack",
+    "dev": "next dev --turbopack",
     "build": "next build",
-    "build:gh-pages": "BASE_PATH=/Die-kleinen-Einsteins next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "next": "^16.1.6",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "next": "16.1.1"
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/react-router": "^5.1.20",
+    "@types/react-router-dom": "^5.3.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
-    "@eslint/eslintrc": "^3"
+    "typescript": "^5"
   }
 }
