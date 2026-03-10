@@ -1,0 +1,21 @@
+.statusbar {
+    background-color: blanchedalmond;
+    color: black;
+    padding: 15px 20px;
+    font-size: 18px;
+    text-align: center;
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    margin: 20px auto;
+}
+
+#correct-count {
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+#wrong-count {
+    font-weight: bold;
+    color: #ff6b6b;
+}
