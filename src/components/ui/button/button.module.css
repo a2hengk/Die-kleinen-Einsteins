@@ -1,8 +1,28 @@
-.button {
-  background: var(--color-primary);;
-  color: white;
+.body {
   border: none;
   padding: 8px 16px;
-  border-radius: 20px;
+  border-radius: 15px;
   cursor: pointer;
+}
+
+.body:hover {
+  filter: brightness(0.5);
+}
+
+.primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.secondary {
+  background: var(--color-secondary);
+  color: #444;
+}
+
+.correct {
+  border: 1px solid #5ACF67;
+}
+
+.wrong {
+  border: 1px solid #ED8585;
 }

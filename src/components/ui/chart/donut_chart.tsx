@@ -10,7 +10,7 @@ type DonutChartProps = {
 export default function DonutChart({
   data = [10, 5],
   size = 200,
-  strokeWidth = 40,
+  strokeWidth = 20,
   colors = ["#5ACF67", "#ED8585", "#81A9FF"],
 }: DonutChartProps) {
   const total = data.reduce((acc, val) => acc + val, 0);

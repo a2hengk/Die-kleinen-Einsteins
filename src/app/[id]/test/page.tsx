@@ -6,9 +6,9 @@ import { X } from "lucide-react";
 import { LearnCart } from "@/components/ui/cart/learn/learn_cart";
 import { Action, QuizState } from "../../../lib/types";
 import { initialQuizState, initialQuizData } from "../../../lib/constants";
-
 import styles from "./test_page.module.css";
 import { Result } from "./result";
+import { ResultSidebar } from "@/components/ui/sidebar/result_sidebar";
 
 export default function TestPage() {
   const [state, dispatch] = useReducer(reducer, initialQuizState);
@@ -18,11 +18,14 @@ export default function TestPage() {
   function reducer(state: QuizState, action: Action): QuizState {
     switch (action.type) {
       case "ANSWER":
+        const updatedAnswers = [...state.answers];
+        updatedAnswers[state.currentIndex] = action.answer;
         return {
           ...state,
-          selectedAnswer: true,
+          isAnswered: true,
           score: action.payload ? state.score + 1 : state.score,
           fail: action.payload ? state.fail : state.fail + 1,
+          answers: updatedAnswers,
           results: [...state.results, action.payload ? "correct" : "wrong"],
         };
 
@@ -30,7 +33,13 @@ export default function TestPage() {
         return {
           ...state,
           currentIndex: state.currentIndex + 1,
-          selectedAnswer: false,
+          isAnswered: false,
+        };
+
+      case "SHOW":
+        return {
+          ...state,
+          currentIndex: action.payload,
         };
 
       case "RESTART":
@@ -41,19 +50,23 @@ export default function TestPage() {
     }
   }
 
-  function handleAnswer(selectedAnswer: string) {
-    if (state.selectedAnswer) return;
+  const handleAnswer = (selectedAnswer: string) => {
+    if (state.isAnswered) return;
 
     const isCorrect = selectedAnswer === currentQuestion.correct;
 
-    dispatch({ type: "ANSWER", payload: isCorrect });
+    dispatch({ type: "ANSWER", payload: isCorrect, answer: selectedAnswer });
 
     if (state.currentIndex + 1 < initialQuizData.length) {
       dispatch({ type: "NEXT" });
     } else {
       setIsFinished(true);
     }
-  }
+  };
+
+  const showAnswer = (selectedIndex: number) => {
+    dispatch({ type: "SHOW", payload: selectedIndex });
+  };
 
   return (
     <>
@@ -73,12 +86,18 @@ export default function TestPage() {
       </div>
 
       <div className={styles.container}>
-        {isFinished ? <Result data={state} /> : null}
+        {isFinished && (
+          <div className={styles.resultWrapper}>
+            <ResultSidebar data={state} onClick={showAnswer} />
+            <Result data={state} />
+          </div>
+        )}
         <LearnCart
           data={currentQuestion}
           onAnswer={handleAnswer}
-          answered={state.selectedAnswer}
+          answered={state.isAnswered}
           correctAnswer={currentQuestion.correct}
+          selectedAnswer={state.answers[state.currentIndex]}
         />
       </div>
     </>

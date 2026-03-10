@@ -20,11 +20,13 @@ export type QuizState = {
   currentIndex: number;
   score: number;
   fail: number;
-  selectedAnswer: boolean;
+  isAnswered: boolean;
+  answers: (string | null)[];
   results: ("correct" | "wrong" | "skipped")[]
 };
 
 export type Action =
-  | { type: "ANSWER"; payload: boolean }
+  | { type: "ANSWER"; payload: boolean; answer: string }
   | { type: "NEXT" }
+  | { type: "SHOW"; payload: number }
   | { type: "RESTART" };

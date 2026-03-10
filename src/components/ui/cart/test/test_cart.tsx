@@ -1,28 +1,30 @@
-"use client";
-
 import { useState } from "react";
 import styles from "./test_cart.module.css";
+import { Questions } from "@/lib/types";
 
-export function TestCart () {
+interface PageProps {
+  data: Questions;
+}
+
+export function TestCart({ data }: PageProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+
   return (
     <div
       className={styles.card_container}
       onClick={() => setIsFlipped(!isFlipped)}
     >
       <div className={`${styles.card} ${isFlipped ? styles.flipped : ""}`}>
-        {/* Vorderseite */}
+        {/* Front-side */}
         <div className={styles.front}>
-          <h2>Frage</h2>
-          <p>Was ist React?</p>
+          <p>{data.question}</p>
         </div>
 
-        {/* Rückseite */}
+        {/* Back-side */}
         <div className={styles.back}>
-          <h2>Antwort</h2>
-          <p>Eine JavaScript Library für UI</p>
+          <p>{data.correct}</p>
         </div>
       </div>
     </div>
   );
-};
+}

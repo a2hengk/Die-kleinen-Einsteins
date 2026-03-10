@@ -7,21 +7,25 @@
   flex-direction: column;
   gap: 8px;
 }
-
-.motivation{
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.item:hover {
+  transform: scale(1.1);
+  background-color: #c9c9c9;
+}
+.icon {
+  width: 16px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 25px;
-  font-weight: 500;
 }
-.info_container {
-  display: flex;
-  justify-content: center;
-  margin: 35px 0;
+.number {
+  color: #444;
 }
-.info_text {
-  margin: 15px;
-}
-
-
