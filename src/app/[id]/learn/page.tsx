@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button/button";
 import Link from "next/link";
 import { initialQuizData } from "@/lib/constants";
 import { Questions } from "@/lib/types";
+import { Header } from "@/components/layout/header/header";
 
 interface PageProps {
   params: {
@@ -29,14 +30,7 @@ export default function LearnPage({ params }: PageProps) {
   };
   return (
     <>
-      <div className={styles.header}>
-        <div>Logo</div>
-        <div>
-          <Link href="/">
-            <X />
-          </Link>
-        </div>
-      </div>
+      <Header isAddition={false} />
       <div className={styles.container}>
         <TestCart data={currentQuestion} />
         <div className={styles.action_info}>

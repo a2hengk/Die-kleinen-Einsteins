@@ -9,6 +9,7 @@ import { initialQuizState, initialQuizData } from "../../../lib/constants";
 import styles from "./test_page.module.css";
 import { Result } from "./result";
 import { ResultSidebar } from "@/components/ui/sidebar/result_sidebar";
+import { Header } from "@/components/layout/header/header";
 
 export default function TestPage() {
   const [state, dispatch] = useReducer(reducer, initialQuizState);
@@ -70,20 +71,12 @@ export default function TestPage() {
 
   return (
     <>
-      <div className={styles.header}>
-        <div>Logo</div>
-        <div className={styles.action_info}>
-          <p>
-            {state.currentIndex + 1} / {initialQuizData.length}
-          </p>
-          <p>Learn Algorithm von Lehrerin</p>
-        </div>
-        <div>
-          <Link href="/">
-            <X />
-          </Link>
-        </div>
-      </div>
+      <Header
+        currentIndex={state.currentIndex + 1}
+        totalIndex={initialQuizData.length}
+        isAddition={true}
+        title="Learn Algorithm von Lehrerin"
+      />
 
       <div className={styles.container}>
         {isFinished && (
