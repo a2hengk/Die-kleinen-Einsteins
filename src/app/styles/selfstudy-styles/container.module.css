@@ -1,9 +1,16 @@
-.karteikarte {
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color:#000;
+}
+
+.card {
     background-color: white;
     margin: 20px auto;
     width: 500px;
     height: 400px;
-    border: 1px solid #ccc;
+    border: 1px solid black;
     border-radius: 8px;
 }
 
@@ -16,15 +23,15 @@
     justify-content: space-between;
 }
 
-#right {
+.right {
     flex: 1;
 }
 
-#wrong {
+.wrong {
     flex: 1;
 }
 
-#show-answer {
+.showAnswer {
     width: 100%;
     margin-top: 10px;
 }

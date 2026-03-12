@@ -10,12 +10,12 @@
     margin: 20px auto;
 }
 
-#correct-count {
+.correctCount {
     font-weight: bold;
     color: #4CAF50;
 }
 
-#wrong-count {
+.wrongCount {
     font-weight: bold;
     color: #ff6b6b;
 }
