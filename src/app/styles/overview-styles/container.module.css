@@ -58,3 +58,50 @@
     background-color: #ffffff;
     transition: all 100ms ease;
 }
+
+.formContainer {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color:#000;
+}
+
+.formContainer h2 {
+    margin-bottom: 15px;
+}
+
+.cardItem {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cardContent {
+    color:#000;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cardContent:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cardContent p {
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.cardContent strong {
+    display: block;
+    margin-bottom: 4px;
+}

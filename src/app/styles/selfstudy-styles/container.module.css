@@ -23,6 +23,17 @@
     justify-content: space-between;
 }
 
+.flip {
+    width: 100%;
+    margin-top: 20px;
+    transition: 0.3s ease;
+}
+
+.flipover {
+    transform: rotateY(180deg);
+}
+
+
 .right {
     flex: 1;
 }

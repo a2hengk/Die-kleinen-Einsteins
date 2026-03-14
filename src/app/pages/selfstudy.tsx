@@ -6,6 +6,7 @@ import stylesStatusbar from '../styles/selfstudy-styles/statusbar.module.css';
 import stylesBody from '../styles/overview-styles/body.module.css';
 
 export default function SelfStudy() {
+  const [isFlipped, setIsFlipped] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
 
@@ -17,7 +18,9 @@ export default function SelfStudy() {
           <span>Correct: <span className={stylesStatusbar.correctCount}>{correctCount}</span></span>
           <span>Wrong: <span className={stylesStatusbar.wrongCount}>{wrongCount}</span></span>
         </div>
-        <div className={stylesContainer.card}></div>
+        <div className={stylesContainer.card} onClick={() => setIsFlipped(!isFlipped)}>
+          {isFlipped ? 'Flipped Content' : 'Original Content'}
+        </div>
         <div className={stylesContainer.buttons}>
           <button className={stylesContainer.right} onClick={() => setCorrectCount(correctCount + 1)}>Correct</button>
           <button className={stylesContainer.wrong} onClick={() => setWrongCount(wrongCount + 1)}>Wrong</button>
