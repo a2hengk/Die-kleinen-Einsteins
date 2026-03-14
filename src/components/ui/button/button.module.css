@@ -1,0 +1,29 @@
+.body {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all .12s cubic-bezier(.47, 0, .745, .715);
+}
+
+.body:hover {
+  filter: brightness(0.5);
+}
+
+.primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.secondary {
+  background: var(--color-secondary);
+  color: #444;
+}
+
+.correct {
+  border: 1px solid #5ACF67;
+}
+
+.wrong {
+  border: 1px solid #ED8585;
+}
