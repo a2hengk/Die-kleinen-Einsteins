@@ -44,7 +44,7 @@ function reducer(state: QuizState, action: Action): QuizState {
   }
 }
 
-export default function TestPage() {
+export default function abfrage() {
   const [state, dispatch] = useReducer(reducer, initialQuizState);
   const [isFilled, setIsFilled] = useState(true);
   const [answer, setAnswer] = useState("");
