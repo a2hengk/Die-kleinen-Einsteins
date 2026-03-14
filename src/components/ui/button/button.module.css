@@ -3,6 +3,7 @@
   padding: 8px 16px;
   border-radius: 15px;
   cursor: pointer;
+  transition: all .12s cubic-bezier(.47, 0, .745, .715);
 }
 
 .body:hover {

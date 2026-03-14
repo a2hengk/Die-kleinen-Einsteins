@@ -1,13 +1,13 @@
 "use client";
 
-import { useReducer, useState } from "react";
-import { LearnCart } from "@/components/ui/cart/learn/learn_cart";
-import { Action, QuizState } from "../../../lib/types";
-import { initialQuizState, initialQuizData } from "../../../lib/constants";
-import styles from "./test_page.module.css";
-import { Result } from "../../../components/test/result";
-import { ResultSidebar } from "@/components/ui/sidebar/result_sidebar";
+import { Button } from "@/components/ui/button/button";
+import styles from "./blast.module.css";
 import { Header } from "@/components/layout/header/header";
+import { BlastCart } from "@/components/ui/cart/blast/blast_cart";
+import { initialQuizData, initialQuizState } from "@/lib/constants";
+import { Action, QuizState } from "@/lib/types";
+import { useReducer, useState } from "react";
+import { useRouter } from "next/navigation";
 
 function reducer(state: QuizState, action: Action): QuizState {
   switch (action.type) {
@@ -46,25 +46,33 @@ function reducer(state: QuizState, action: Action): QuizState {
 
 export default function TestPage() {
   const [state, dispatch] = useReducer(reducer, initialQuizState);
-  const [isFinished, setIsFinished] = useState(false);
+  const [isFilled, setIsFilled] = useState(true);
+  const [answer, setAnswer] = useState("");
+  const router = useRouter();
   const currentQuestion = initialQuizData[state.currentIndex];
 
-  const handleAnswer = (selectedAnswer: string) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAnswer(e.target.value);
+    setIsFilled(true);
+  };
+
+  const handleAnswer = () => {
     if (state.isAnswered) return;
 
-    const isCorrect = selectedAnswer === currentQuestion.correct;
+    if (answer.trim() === "") setIsFilled(false);
+    else setIsFilled(true);
 
-    dispatch({ type: "ANSWER", payload: isCorrect, answer: selectedAnswer });
+    const isCorrect = answer === currentQuestion.correct;
 
+    dispatch({ type: "ANSWER", payload: isCorrect, answer: answer });
+  };
+
+  const handleNext = () => {
     if (state.currentIndex + 1 < initialQuizData.length) {
       dispatch({ type: "NEXT" });
     } else {
-      setIsFinished(true);
+      router.push("/");
     }
-  };
-
-  const showAnswer = (selectedIndex: number) => {
-    dispatch({ type: "SHOW", payload: selectedIndex });
   };
 
   return (
@@ -77,19 +85,18 @@ export default function TestPage() {
       />
 
       <div className={styles.container}>
-        {isFinished && (
-          <div className={styles.resultWrapper}>
-            <ResultSidebar data={state} onClick={showAnswer} />
-            <Result data={state} />
+        <BlastCart
+          data={currentQuestion}
+          onEnter={handleAnswer}
+          onChange={onChange}
+          isFilled={isFilled}
+          state={state}
+        />
+        {state.isAnswered && (
+          <div className={styles.action_container}>
+            <Button content="Continue" color="primary" onClick={handleNext} />
           </div>
         )}
-        <LearnCart
-          data={currentQuestion}
-          onAnswer={handleAnswer}
-          answered={state.isAnswered}
-          correctAnswer={currentQuestion.correct}
-          selectedAnswer={state.answers[state.currentIndex]}
-        />
       </div>
     </>
   );

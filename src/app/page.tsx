@@ -1,5 +1,4 @@
 import { Navbar } from "@/components/layout/navbar/navbar";
-import styles from "./page.module.css";
 import { Footer } from "@/components/layout/footer/footer";
 
 export default function Home() {
@@ -15,3 +14,5 @@ export default function Home() {
     </>
   );
 }
+
+

@@ -1,0 +1,23 @@
+.header{
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 901;
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem 0;
+}
+.container{
+    max-width: 550px;
+    margin: 0 auto;
+}
+.action_info{
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+}
+.action_container{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}

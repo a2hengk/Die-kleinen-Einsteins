@@ -1,0 +1,27 @@
+.container{
+    margin: 15px 0;
+}
+.answer_container{
+    transition: all .5s ease;
+    font-weight: 400;
+    letter-spacing: normal;
+    line-height: 1.5;
+    align-items: center;
+    border-radius: .5rem;
+    border: .125rem solid #586380;
+    display: flex;
+    padding: 10px;
+}
+.correct {
+    border-color: #5ACF67;
+    border-style: dashed;
+}
+.current {
+    border-color: #ED8585;
+}
+.promt_current{
+    color: #ED8585;
+}
+.promt_correct{
+    color:#5ACF67
+}
