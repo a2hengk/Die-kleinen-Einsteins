@@ -5,9 +5,16 @@ import styles from "./../styles/abfrage-styles/blast.module.css";
 import { AbfrageCart } from "@/components/ui/cart/abfrage/abfrage_cart";
 import { initialQuizData, initialQuizState } from "@/lib/constants";
 import { Action, QuizState } from "@/lib/types";
-import { useReducer, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Result } from "@/components/test/result";
+
+// import navbar
+import { useEffect, useRef, useState, useReducer} from "react";
+import { mountFloatingNavBar } from "../../components/navbar-components/floatingNavBar";
+import { createInfoModal } from "../../components/navbar-components/infoModal";
+import { configureDialogTrigger } from "../../components/navbar-components/modalUtils";
+import { createSettingsModal } from "../../components/navbar-components/settingsModal";
+
 
 function reducer(state: QuizState, action: Action): QuizState {
   switch (action.type) {

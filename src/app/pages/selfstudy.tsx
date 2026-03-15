@@ -1,9 +1,15 @@
 "use client";
 
-import { useState } from 'react';
 import stylesContainer from '../styles/selfstudy-styles/container.module.css';
 import stylesStatusbar from '../styles/selfstudy-styles/statusbar.module.css';
 import stylesBody from '../styles/overview-styles/body.module.css';
+
+// import navbar
+import { useEffect, useRef, useState } from "react";
+import { mountFloatingNavBar } from "../../components/navbar-components/floatingNavBar";
+import { createInfoModal } from "../../components/navbar-components/infoModal";
+import { configureDialogTrigger } from "../../components/navbar-components/modalUtils";
+import { createSettingsModal } from "../../components/navbar-components/settingsModal";
 
 export default function SelfStudy() {
   const [isFlipped, setIsFlipped] = useState(false);

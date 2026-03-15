@@ -3,7 +3,13 @@
 import styleContainer from "../styles/overview-styles/container.module.css";
 import styleButton from "../styles/overview-styles/button.module.css";
 import styleBody from "../styles/overview-styles/body.module.css";
-import { useState } from "react";
+
+// import navbar
+import { useEffect, useRef, useState } from "react";
+import { mountFloatingNavBar } from "../../components/navbar-components/floatingNavBar";
+import { createInfoModal } from "../../components/navbar-components/infoModal";
+import { configureDialogTrigger } from "../../components/navbar-components/modalUtils";
+import { createSettingsModal } from "../../components/navbar-components/settingsModal";
 
 interface Card {
     id: number;
@@ -73,79 +79,76 @@ export default function Overview() {
     return (
         <div className={styleContainer.header}>
             <h1 className={styleContainer.title}>Karteikartenuebersicht</h1>
-
-            <main className={styleBody.main}>
-                {/* Formular zum Hinzufügen/Bearbeiten */}
-                <div className={styleContainer.formContainer}>
-                    <h2>{editingId ? "Karte bearbeiten" : "Neue Karte hinzufügen"}</h2>
-                    <input
-                        type="text"
-                        placeholder="Vorderseite"
-                        value={formData.front}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, front: e.target.value }))}
-                        className={styleButton.input}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Rückseite"
-                        value={formData.back}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, back: e.target.value }))}
-                        className={styleButton.input}
-                    />
-                    <div className={styleButton.buttonGroup}>
+            {/* Formular zum Hinzufügen/Bearbeiten */}
+            <div className={styleContainer.formContainer}>
+                <h2>{editingId ? "Karte bearbeiten" : "Neue Karte hinzufügen"}</h2>
+                <input
+                    type="text"
+                    placeholder="Vorderseite"
+                    value={formData.front}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, front: e.target.value }))}
+                    className={styleButton.input}
+                />
+                <input
+                    type="text"
+                    placeholder="Rückseite"
+                    value={formData.back}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, back: e.target.value }))}
+                    className={styleButton.input}
+                />
+                <div className={styleButton.buttonGroup}>
+                    <button
+                        onClick={addCard}
+                        className={styleButton.submitButton}
+                    >
+                        {editingId ? "Speichern" : "Hinzufügen"}
+                    </button>
+                    {editingId && (
                         <button
-                            onClick={addCard}
-                            className={styleButton.submitButton}
+                            onClick={cancelEdit}
+                            className={styleButton.cancelButton}
                         >
-                            {editingId ? "Speichern" : "Hinzufügen"}
+                            Abbrechen
                         </button>
-                        {editingId && (
-                            <button
-                                onClick={cancelEdit}
-                                className={styleButton.cancelButton}
-                            >
-                                Abbrechen
-                            </button>
-                        )}
-                    </div>
+                    )}
                 </div>
+            </div>
 
-                {/* Kartenliste */}
-                <div className={styleContainer.cardContainer}>
-                    {cards.map((card) => (
-                        <div key={card.id} className={styleContainer.cardItem}>
-                            <div
-                                className={`${styleContainer.card} ${
-                                    clicked.includes(card.id) ? "clicked" : ""
-                                }`}
-                                onClick={() => toggleCard(card.id)}
-                            >
-                                <div className={styleContainer.cardContent}>
-                                    <div>
-                                        <p><strong>Vorderseite:</strong> {card.front}</p>
-                                        <p><strong>Rückseite:</strong> {card.back}</p>
-                                    </div>
-                                    <button
-                                        className={styleButton.editButton}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            removeCard(card.id);
-                                        }}
-                                    >
-                                        Löschen
-                                    </button>
+            {/* Kartenliste */}
+            <div className={styleContainer.cardContainer}>
+                {cards.map((card) => (
+                    <div key={card.id} className={styleContainer.cardItem}>
+                        <div
+                            className={`${styleContainer.card} ${
+                                clicked.includes(card.id) ? "clicked" : ""
+                            }`}
+                            onClick={() => toggleCard(card.id)}
+                        >
+                            <div className={styleContainer.cardContent}>
+                                <div>
+                                    <p><strong>Vorderseite:</strong> {card.front}</p>
+                                    <p><strong>Rückseite:</strong> {card.back}</p>
                                 </div>
+                                <button
+                                    className={styleButton.editButton}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        removeCard(card.id);
+                                    }}
+                                >
+                                    Löschen
+                                </button>
                             </div>
-                            <button
-                                className={styleButton.editButton}
-                                onClick={() => editCard(card.id)}
-                            >
-                                Bearbeiten
-                            </button>
                         </div>
-                    ))}
-                </div>
-            </main>
+                        <button
+                            className={styleButton.editButton}
+                            onClick={() => editCard(card.id)}
+                        >
+                            Bearbeiten
+                        </button>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

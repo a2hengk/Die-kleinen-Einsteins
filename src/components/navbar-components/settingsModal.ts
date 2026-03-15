@@ -1,4 +1,4 @@
-import { DEMO_DEFAULT_SETTINGS } from "../data/demoData";
+import { DEMO_DEFAULT_SETTINGS } from "../navbar-data/demoData";
 import type { AppSettings } from "../types/settings";
 import { createManagedModal } from "./modalUtils";
 
