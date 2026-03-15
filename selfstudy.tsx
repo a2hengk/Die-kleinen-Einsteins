@@ -1,20 +1,21 @@
 "use client";
 
-import { createInfoModal } from '../../../components/infoModal';
-import { createSettingsModal } from '../../../components/settingsModal';
-import { mountFloatingNavBar } from '../../../components/floatingNavBar';
-import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
 import stylesContainer from '../styles/selfstudy-styles/container.module.css';
 import stylesStatusbar from '../styles/selfstudy-styles/statusbar.module.css';
 import stylesBody from '../styles/overview-styles/body.module.css';
+
+// import navbar
+import { useEffect, useRef, useState } from "react";
+import { mountFloatingNavBar } from "../../components/navbar-components/floatingNavBar";
+import { createInfoModal } from "../../components/navbar-components/infoModal";
+import { configureDialogTrigger } from "../../components/navbar-components/modalUtils";
+import { createSettingsModal } from "../../components/navbar-components/settingsModal";
 
 export default function SelfStudy() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
   const navMountRef = useRef<HTMLDivElement | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     if (!navMountRef.current) {
@@ -30,12 +31,12 @@ export default function SelfStudy() {
     const navController = mountFloatingNavBar({
       mount: navMountRef.current,
       onNavigate: (itemId) => {
-        if (itemId === 'selbstlernen') {
-          router.push('/selfstudy');
+        if (itemId === "selbstlernen") {
+          return;
         }
 
-        if (itemId === 'abfragen') {
-          router.push('/abfrage');
+        if (itemId === "abfragen") {
+          window.location.href = "/abfrage";
         }
       },
       onOpenInfo: () => {
@@ -46,6 +47,8 @@ export default function SelfStudy() {
       }
     });
 
+    const infoButton = navController.getInfoButton();
+    const settingsButton = navController.getSettingsButton();
     const selbstlernenButton = navMountRef.current.querySelector<HTMLButtonElement>(
       '[data-nav-id="selbstlernen"]'
     );
@@ -53,35 +56,35 @@ export default function SelfStudy() {
       '[data-nav-id="karteikasten"]'
     );
 
-    karteikastenButton?.classList.remove('is-active');
-    karteikastenButton?.setAttribute('aria-current', 'false');
-    selbstlernenButton?.classList.add('is-active');
-    selbstlernenButton?.setAttribute('aria-current', 'page');
+    configureDialogTrigger(infoButton, "vocab-info-dialog");
+    configureDialogTrigger(settingsButton, "vocab-settings-dialog");
+    karteikastenButton?.classList.remove("is-active");
+    karteikastenButton?.setAttribute("aria-current", "false");
+    selbstlernenButton?.classList.add("is-active");
+    selbstlernenButton?.setAttribute("aria-current", "page");
 
     return () => {
       navController.destroy();
       infoModalController.destroy();
       settingsModalController.destroy();
     };
-  }, [router]);
+  }, []);
 
   return (
     <div className={stylesContainer.container}>
       <h1 className={stylesContainer.title}>Self Study</h1>
-      <main className={stylesBody.body}>
-        <div className={stylesStatusbar.statusbar}>
-          <span>Correct: <span className={stylesStatusbar.correctCount}>{correctCount}</span></span>
-          <span>Wrong: <span className={stylesStatusbar.wrongCount}>{wrongCount}</span></span>
-        </div>
-        <div className={stylesContainer.card} onClick={() => setIsFlipped(!isFlipped)}>
-          {isFlipped ? 'Flipped Content' : 'Original Content'}
-        </div>
-        <div className={stylesContainer.buttons}>
-          <button className={stylesContainer.right} onClick={() => setCorrectCount(correctCount + 1)}>Correct</button>
-          <button className={stylesContainer.wrong} onClick={() => setWrongCount(wrongCount + 1)}>Wrong</button>
-          <button className={stylesContainer.showAnswer}>Show Answer</button>
-        </div>
-      </main>
+      <div className={stylesStatusbar.statusbar}>
+        <span>Correct: <span className={stylesStatusbar.correctCount}>{correctCount}</span></span>
+        <span>Wrong: <span className={stylesStatusbar.wrongCount}>{wrongCount}</span></span>
+      </div>
+      <div className={stylesContainer.card} onClick={() => setIsFlipped(!isFlipped)}>
+        {isFlipped ? 'Flipped Content' : 'Original Content'}
+      </div>
+      <div className={stylesContainer.buttons}>
+        <button className={stylesContainer.right} onClick={() => setCorrectCount(correctCount + 1)}>Correct</button>
+        <button className={stylesContainer.wrong} onClick={() => setWrongCount(wrongCount + 1)}>Wrong</button>
+        <button className={stylesContainer.showAnswer}>Show Answer</button>
+      </div>
       <div ref={navMountRef} />
     </div>
   );

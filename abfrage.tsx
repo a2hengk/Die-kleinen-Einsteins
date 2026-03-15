@@ -1,16 +1,20 @@
 "use client";
 
-import { mountFloatingNavBar } from "../../../components/floatingNavBar";
-import { createInfoModal } from "../../../components/infoModal";
-import { createSettingsModal } from "../../../components/settingsModal";
 import { Button } from "@/components/ui/button/button";
 import styles from "./../styles/abfrage-styles/blast.module.css";
 import { AbfrageCart } from "@/components/ui/cart/abfrage/abfrage_cart";
 import { initialQuizData, initialQuizState } from "@/lib/constants";
 import { Action, QuizState } from "@/lib/types";
-import { useEffect, useReducer, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Result } from "@/components/test/result";
+
+// import navbar
+import { useEffect, useRef, useState, useReducer} from "react";
+import { mountFloatingNavBar } from "../../components/navbar-components/floatingNavBar";
+import { createInfoModal } from "../../components/navbar-components/infoModal";
+import { configureDialogTrigger } from "../../components/navbar-components/modalUtils";
+import { createSettingsModal } from "../../components/navbar-components/settingsModal";
+
 
 function reducer(state: QuizState, action: Action): QuizState {
   switch (action.type) {
@@ -75,7 +79,7 @@ export default function abfrage() {
         }
 
         if (itemId === "abfragen") {
-          router.push("/abfrage");
+          return;
         }
       },
       onOpenInfo: () => {
@@ -86,6 +90,8 @@ export default function abfrage() {
       }
     });
 
+    const infoButton = navController.getInfoButton();
+    const settingsButton = navController.getSettingsButton();
     const abfragenButton = navMountRef.current.querySelector<HTMLButtonElement>(
       '[data-nav-id="abfragen"]'
     );
@@ -93,6 +99,8 @@ export default function abfrage() {
       '[data-nav-id="karteikasten"]'
     );
 
+    configureDialogTrigger(infoButton, "vocab-info-dialog");
+    configureDialogTrigger(settingsButton, "vocab-settings-dialog");
     karteikastenButton?.classList.remove("is-active");
     karteikastenButton?.setAttribute("aria-current", "false");
     abfragenButton?.classList.add("is-active");
