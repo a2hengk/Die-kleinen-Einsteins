@@ -1,10 +1,10 @@
 import type { Questions, QuizState } from "@/lib/types";
-import styles from "./blast_cart.module.css";
+import styles from "./abfrage_cart.module.css";
 import Input from "../../input/input";
 import { Button } from "../../button/button";
 import { Answer } from "@/components/blast/answer";
 
-type BlastCartProps = {
+type AbfrageCartProps = {
   data: Questions;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onEnter?: () => void;
@@ -12,13 +12,13 @@ type BlastCartProps = {
   state: QuizState;
 };
 
-export const BlastCart = ({
+export const AbfrageCart = ({
   data,
   onChange,
   onEnter,
   isFilled,
   state,
-}: BlastCartProps) => {
+}: AbfrageCartProps) => {
   return (
     <div className={styles.container}>
       <div className={styles.question}>{data.question}</div>

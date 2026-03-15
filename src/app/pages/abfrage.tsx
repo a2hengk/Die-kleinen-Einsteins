@@ -1,13 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button/button";
-import styles from "./blast.module.css";
-import { Header } from "@/components/layout/header/header";
-import { BlastCart } from "@/components/ui/cart/blast/blast_cart";
+import styles from "./../styles/abfrage-styles/blast.module.css";
+import { AbfrageCart } from "@/components/ui/cart/abfrage/abfrage_cart";
 import { initialQuizData, initialQuizState } from "@/lib/constants";
 import { Action, QuizState } from "@/lib/types";
 import { useReducer, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Result } from "@/components/test/result";
 
 function reducer(state: QuizState, action: Action): QuizState {
   switch (action.type) {
@@ -48,6 +48,7 @@ export default function abfrage() {
   const [state, dispatch] = useReducer(reducer, initialQuizState);
   const [isFilled, setIsFilled] = useState(true);
   const [answer, setAnswer] = useState("");
+  const [isFinished, setIsFinished] = useState(false);
   const router = useRouter();
   const currentQuestion = initialQuizData[state.currentIndex];
 
@@ -71,30 +72,35 @@ export default function abfrage() {
     if (state.currentIndex + 1 < initialQuizData.length) {
       dispatch({ type: "NEXT" });
     } else {
-      router.push("/");
+      setIsFinished(true);
     }
   };
 
   return (
     <>
-      <Header
-        currentIndex={state.currentIndex + 1}
-        totalIndex={initialQuizData.length}
-        isAddition={true}
-        title="Learn Algorithm von Lehrerin"
-      />
-
       <div className={styles.container}>
-        <BlastCart
-          data={currentQuestion}
-          onEnter={handleAnswer}
-          onChange={onChange}
-          isFilled={isFilled}
-          state={state}
-        />
-        {state.isAnswered && (
-          <div className={styles.action_container}>
-            <Button content="Continue" color="primary" onClick={handleNext} />
+        {isFinished ? (
+          <div className={styles.resultWrapper}>
+            <Result data={state} />
+          </div>
+        ) : (
+          <div>
+            <AbfrageCart
+              data={currentQuestion}
+              onEnter={handleAnswer}
+              onChange={onChange}
+              isFilled={isFilled}
+              state={state}
+            />
+            {state.isAnswered && (
+              <div className={styles.action_container}>
+                <Button
+                  content="Continue"
+                  color="primary"
+                  onClick={handleNext}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
