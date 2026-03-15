@@ -19,20 +19,18 @@ export default function SelfStudy() {
   return (
     <div className={stylesContainer.container}>
       <h1 className={stylesContainer.title}>Self Study</h1>
-      <main className={stylesBody.body}>
-        <div className={stylesStatusbar.statusbar}>
-          <span>Correct: <span className={stylesStatusbar.correctCount}>{correctCount}</span></span>
-          <span>Wrong: <span className={stylesStatusbar.wrongCount}>{wrongCount}</span></span>
-        </div>
-        <div className={stylesContainer.card} onClick={() => setIsFlipped(!isFlipped)}>
-          {isFlipped ? 'Flipped Content' : 'Original Content'}
-        </div>
-        <div className={stylesContainer.buttons}>
-          <button className={stylesContainer.right} onClick={() => setCorrectCount(correctCount + 1)}>Correct</button>
-          <button className={stylesContainer.wrong} onClick={() => setWrongCount(wrongCount + 1)}>Wrong</button>
-          <button className={stylesContainer.showAnswer}>Show Answer</button>
-        </div>
-      </main>
+      <div className={stylesStatusbar.statusbar}>
+        <span>Correct: <span className={stylesStatusbar.correctCount}>{correctCount}</span></span>
+        <span>Wrong: <span className={stylesStatusbar.wrongCount}>{wrongCount}</span></span>
+      </div>
+      <div className={stylesContainer.card} onClick={() => setIsFlipped(!isFlipped)}>
+        {isFlipped ? 'Flipped Content' : 'Original Content'}
+      </div>
+      <div className={stylesContainer.buttons}>
+        <button className={stylesContainer.right} onClick={() => setCorrectCount(correctCount + 1)}>Correct</button>
+        <button className={stylesContainer.wrong} onClick={() => setWrongCount(wrongCount + 1)}>Wrong</button>
+        <button className={stylesContainer.showAnswer}>Show Answer</button>
+      </div>
     </div>
   );
 }

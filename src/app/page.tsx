@@ -1,10 +1,8 @@
-import { Navbar } from "@/components/layout/navbar/navbar";
 import { Footer } from "@/components/layout/footer/footer";
 
 export default function Home() {
   return (
     <>
-      <Navbar />
       <h1>
         Lorem Ipsum is simply dummy text of the printing and typesetting
         industry. Lorem
