@@ -1,0 +1,27 @@
+.sidebar {
+  position: absolute;
+  left: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.motivation{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 25px;
+  font-weight: 500;
+}
+.info_container {
+  display: flex;
+  justify-content: center;
+  margin: 35px 0;
+}
+.info_text {
+  margin: 15px;
+}
+
+

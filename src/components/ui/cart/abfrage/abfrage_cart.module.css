@@ -1,0 +1,40 @@
+.container{
+    background-color: antiquewhite;
+    border: 0.25px solid;
+    border-radius: 15px;
+    padding: 20px;
+}
+.title{
+    padding: 10px;
+}
+.question{
+    padding: 10px;
+    min-height: 150px;
+}
+.answer{
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+.action{
+    display: flex;   
+    justify-content: end;
+    padding: 20px 0;
+}
+.action_button{
+    margin: 10px;
+    display: inherit;
+}
+.answer_button{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+.warning_container{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+.warning {
+    color: #ED8585
+}
