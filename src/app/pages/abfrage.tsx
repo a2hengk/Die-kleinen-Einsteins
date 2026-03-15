@@ -56,8 +56,62 @@ export default function abfrage() {
   const [isFilled, setIsFilled] = useState(true);
   const [answer, setAnswer] = useState("");
   const [isFinished, setIsFinished] = useState(false);
+  const navMountRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const currentQuestion = initialQuizData[state.currentIndex];
+
+  useEffect(() => {
+    if (!navMountRef.current) {
+      return;
+    }
+
+    const infoModalController = createInfoModal({
+      mount: document.body
+    });
+    const settingsModalController = createSettingsModal({
+      mount: document.body
+    });
+    const navController = mountFloatingNavBar({
+      mount: navMountRef.current,
+      onNavigate: (itemId) => {
+        if (itemId === "selbstlernen") {
+          router.push("/selfstudy");
+        }
+
+        if (itemId === "abfragen") {
+          return;
+        }
+      },
+      onOpenInfo: () => {
+        infoModalController.open();
+      },
+      onOpenSettings: () => {
+        settingsModalController.open();
+      }
+    });
+
+    const infoButton = navController.getInfoButton();
+    const settingsButton = navController.getSettingsButton();
+    const abfragenButton = navMountRef.current.querySelector<HTMLButtonElement>(
+      '[data-nav-id="abfragen"]'
+    );
+    const karteikastenButton = navMountRef.current.querySelector<HTMLButtonElement>(
+      '[data-nav-id="karteikasten"]'
+    );
+
+    configureDialogTrigger(infoButton, "vocab-info-dialog");
+    configureDialogTrigger(settingsButton, "vocab-settings-dialog");
+    karteikastenButton?.classList.remove("is-active");
+    karteikastenButton?.setAttribute("aria-current", "false");
+    abfragenButton?.classList.add("is-active");
+    abfragenButton?.setAttribute("aria-current", "page");
+
+    return () => {
+      navController.destroy();
+      infoModalController.destroy();
+      settingsModalController.destroy();
+    };
+  }, [router]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAnswer(e.target.value);
@@ -111,6 +165,7 @@ export default function abfrage() {
           </div>
         )}
       </div>
+      <div ref={navMountRef} />
     </>
   );
 }

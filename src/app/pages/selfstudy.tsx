@@ -15,6 +15,60 @@ export default function SelfStudy() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
+  const navMountRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!navMountRef.current) {
+      return;
+    }
+
+    const infoModalController = createInfoModal({
+      mount: document.body
+    });
+    const settingsModalController = createSettingsModal({
+      mount: document.body
+    });
+    const navController = mountFloatingNavBar({
+      mount: navMountRef.current,
+      onNavigate: (itemId) => {
+        if (itemId === "selbstlernen") {
+          return;
+        }
+
+        if (itemId === "abfragen") {
+          window.location.href = "/abfrage";
+        }
+      },
+      onOpenInfo: () => {
+        infoModalController.open();
+      },
+      onOpenSettings: () => {
+        settingsModalController.open();
+      }
+    });
+
+    const infoButton = navController.getInfoButton();
+    const settingsButton = navController.getSettingsButton();
+    const selbstlernenButton = navMountRef.current.querySelector<HTMLButtonElement>(
+      '[data-nav-id="selbstlernen"]'
+    );
+    const karteikastenButton = navMountRef.current.querySelector<HTMLButtonElement>(
+      '[data-nav-id="karteikasten"]'
+    );
+
+    configureDialogTrigger(infoButton, "vocab-info-dialog");
+    configureDialogTrigger(settingsButton, "vocab-settings-dialog");
+    karteikastenButton?.classList.remove("is-active");
+    karteikastenButton?.setAttribute("aria-current", "false");
+    selbstlernenButton?.classList.add("is-active");
+    selbstlernenButton?.setAttribute("aria-current", "page");
+
+    return () => {
+      navController.destroy();
+      infoModalController.destroy();
+      settingsModalController.destroy();
+    };
+  }, []);
 
   return (
     <div className={stylesContainer.container}>
@@ -31,6 +85,7 @@ export default function SelfStudy() {
         <button className={stylesContainer.wrong} onClick={() => setWrongCount(wrongCount + 1)}>Wrong</button>
         <button className={stylesContainer.showAnswer}>Show Answer</button>
       </div>
+      <div ref={navMountRef} />
     </div>
   );
 }

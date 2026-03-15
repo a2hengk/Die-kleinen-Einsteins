@@ -1,4 +1,5 @@
 import styles from "./layout.module.css";
+import "../../Component.css";
 import { Roboto } from "next/font/google";
 import type { Metadata } from "next";
 
