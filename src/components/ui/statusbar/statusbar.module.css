@@ -50,6 +50,11 @@
   box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
 }
 
+.boxSkip {
+  background-color: #999999;
+  box-shadow: 0 2px 8px rgba(153, 153, 153, 0.4);
+}
+
 @keyframes popIn {
   0% {
     transform: scale(0);
