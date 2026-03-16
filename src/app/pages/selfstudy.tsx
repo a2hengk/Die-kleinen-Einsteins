@@ -2,7 +2,6 @@
 
 import stylesContainer from '../styles/selfstudy-styles/container.module.css';
 import stylesStatusbar from '../styles/selfstudy-styles/statusbar.module.css';
-import stylesBody from '../styles/overview-styles/body.module.css';
 
 // import navbar
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +15,9 @@ export default function SelfStudy() {
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
   const navMountRef = useRef<HTMLDivElement | null>(null);
+
+
+  // Navbar setup
 
   useEffect(() => {
     if (!navMountRef.current) {
@@ -70,9 +72,10 @@ export default function SelfStudy() {
     };
   }, []);
 
+  // end Navbar setup
+
   return (
-    <div className={stylesContainer.container}>
-      <h1 className={stylesContainer.title}>Self Study</h1>
+    <div className={stylesContainer.primary}>
       <div className={stylesStatusbar.statusbar}>
         <span>Correct: <span className={stylesStatusbar.correctCount}>{correctCount}</span></span>
         <span>Wrong: <span className={stylesStatusbar.wrongCount}>{wrongCount}</span></span>
@@ -83,7 +86,6 @@ export default function SelfStudy() {
       <div className={stylesContainer.buttons}>
         <button className={stylesContainer.right} onClick={() => setCorrectCount(correctCount + 1)}>Correct</button>
         <button className={stylesContainer.wrong} onClick={() => setWrongCount(wrongCount + 1)}>Wrong</button>
-        <button className={stylesContainer.showAnswer}>Show Answer</button>
       </div>
       <div ref={navMountRef} />
     </div>

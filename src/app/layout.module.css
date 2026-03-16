@@ -8,11 +8,11 @@
 
 .main {
   flex: 1;
-  padding-top: 80px; /* Place for top navigation */
+  padding: 20px;
 }
 
 :root {
-  --color-primary: #1e2a78;
+  --color-primary: #EAEFBD;
   --color-secondary: #E8DEF8;
   --color-accent: #ffcc00;
 
