@@ -6,9 +6,11 @@ import { useState, useEffect } from "react";
 interface StatusBarProps {
   correctCount: number;
   wrongCount: number;
+  currentQuestion?: number;
+  totalQuestions?: number;
 }
 
-export default function StatusBar({ correctCount, wrongCount }: StatusBarProps) {
+export default function StatusBar({ correctCount, wrongCount, currentQuestion = 1, totalQuestions = 10 }: StatusBarProps) {
   const [boxes, setBoxes] = useState<Array<{ id: number; type: "correct" | "wrong" }>>([]);
   const [nextId, setNextId] = useState(0);
 
@@ -43,7 +45,11 @@ export default function StatusBar({ correctCount, wrongCount }: StatusBarProps) 
   return (
     <div className={styles.statusbar}>
       <div className={styles.container}>
-        <div className={styles.label}>Correct: {correctCount}</div>
+        <div className={styles.label}>Question {currentQuestion} / {totalQuestions}</div>
+      </div>
+
+      <div className={styles.container}>
+        <div className={styles.label}></div>
         <div className={styles.boxesContainer}>
           {boxes.map((box) => (
             <div
@@ -57,7 +63,7 @@ export default function StatusBar({ correctCount, wrongCount }: StatusBarProps) 
       </div>
 
       <div className={styles.container}>
-        <div className={styles.label}>Wrong: {wrongCount}</div>
+        <div className={styles.label}></div>
       </div>
     </div>
   );

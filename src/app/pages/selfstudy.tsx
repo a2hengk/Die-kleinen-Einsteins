@@ -14,6 +14,8 @@ export default function SelfStudy() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState(1);
+  const totalQuestions = 10;
   const navMountRef = useRef<HTMLDivElement | null>(null);
 
 
@@ -76,7 +78,7 @@ export default function SelfStudy() {
 
   return (
     <div className={stylesContainer.primary}>
-      <StatusBar correctCount={correctCount} wrongCount={wrongCount} />
+      <StatusBar correctCount={correctCount} wrongCount={wrongCount} currentQuestion={currentQuestion} totalQuestions={totalQuestions} />
       <div 
         className={`${stylesContainer.card} ${isFlipped ? stylesContainer.flipover : ''}`}
         onClick={() => setIsFlipped(!isFlipped)}
@@ -84,8 +86,14 @@ export default function SelfStudy() {
         {isFlipped ? 'Flipped Content' : 'Original Content'}
       </div>
       <div className={stylesContainer.buttons}>
-        <button className={stylesContainer.right} onClick={() => setCorrectCount(correctCount + 1)}>Correct</button>
-        <button className={stylesContainer.wrong} onClick={() => setWrongCount(wrongCount + 1)}>Wrong</button>
+        <button className={stylesContainer.right} onClick={() => {
+          setCorrectCount(correctCount + 1);
+          if (currentQuestion < totalQuestions) setCurrentQuestion(currentQuestion + 1);
+        }}>Correct</button>
+        <button className={stylesContainer.wrong} onClick={() => {
+          setWrongCount(wrongCount + 1);
+          if (currentQuestion < totalQuestions) setCurrentQuestion(currentQuestion + 1);
+        }}>Wrong</button>
       </div>
       <div ref={navMountRef} />
     </div>
