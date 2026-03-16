@@ -2,7 +2,7 @@ import type { Questions, QuizState } from "@/lib/types";
 import styles from "./abfrage_cart.module.css";
 import Input from "../../input/input";
 import { Button } from "../../button/button";
-import { Answer } from "@/components/blast/answer";
+import { Answer } from "@/components/abfrage/answer";
 
 type AbfrageCartProps = {
   data: Questions;

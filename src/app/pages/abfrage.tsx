@@ -6,7 +6,7 @@ import { AbfrageCart } from "@/components/ui/cart/abfrage/abfrage_cart";
 import { initialQuizData, initialQuizState } from "@/lib/constants";
 import { Action, QuizState } from "@/lib/types";
 import { useRouter } from "next/navigation";
-import { Result } from "@/components/test/result";
+import { Result } from "@/components/abfrage/result";
 
 // import navbar
 import { useEffect, useRef, useState, useReducer} from "react";
