@@ -75,8 +75,7 @@ export default function SelfStudy() {
   // end Navbar setup
 
   return (
-    <div className={stylesContainer.container}>
-      <h1 className={stylesContainer.title}>Self Study</h1>
+    <div className={stylesContainer.primary}>
       <div className={stylesStatusbar.statusbar}>
         <span>Correct: <span className={stylesStatusbar.correctCount}>{correctCount}</span></span>
         <span>Wrong: <span className={stylesStatusbar.wrongCount}>{wrongCount}</span></span>
