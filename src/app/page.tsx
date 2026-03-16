@@ -1,5 +1,3 @@
-import { Footer } from "@/components/layout/footer/footer";
-
 export default function Home() {
   return (
     <>
@@ -8,7 +6,6 @@ export default function Home() {
         industry. Lorem
       </h1>
       <h1> Carousel </h1>
-      <Footer />
     </>
   );
 }

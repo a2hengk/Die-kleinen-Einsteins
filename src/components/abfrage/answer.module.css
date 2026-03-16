@@ -16,11 +16,11 @@
     border-color: #5ACF67;
     border-style: dashed;
 }
-.current {
-    border-color: #ED8585;
+.wrong {
+    border-color: var(--danger);
 }
-.promt_current{
-    color: #ED8585;
+.promt_wrong{
+    color: var(--danger);
 }
 .promt_correct{
     color:#5ACF67

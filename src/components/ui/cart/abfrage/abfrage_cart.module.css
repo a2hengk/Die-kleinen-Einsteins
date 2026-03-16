@@ -1,8 +1,9 @@
 .container{
-    background-color: antiquewhite;
-    border: 0.25px solid;
-    border-radius: 15px;
+    background-color: var(--panel);
+    border-radius: var(--radius-md);
     padding: 20px;
+    box-shadow: var(--box-shadow);
+    color: var(--text-white);
 }
 .title{
     padding: 10px;
@@ -10,6 +11,7 @@
 .question{
     padding: 10px;
     min-height: 150px;
+    font-weight: 500;
 }
 .answer{
     padding: 20px;
@@ -36,5 +38,5 @@
     margin-top: 8px;
 }
 .warning {
-    color: #ED8585
+    color: var(--danger)
 }

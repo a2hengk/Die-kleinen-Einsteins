@@ -1,20 +1,19 @@
 "use client";
 
 import { Button } from "@/components/ui/button/button";
-import styles from "./../styles/abfrage-styles/blast.module.css";
+import styles from "../styles/abfrage-styles/container.module.css";
 import { AbfrageCart } from "@/components/ui/cart/abfrage/abfrage_cart";
 import { initialQuizData, initialQuizState } from "@/lib/constants";
 import { Action, QuizState } from "@/lib/types";
 import { useRouter } from "next/navigation";
-import { Result } from "@/components/test/result";
+import { Result } from "@/components/abfrage/result";
 
 // import navbar
-import { useEffect, useRef, useState, useReducer} from "react";
+import { useEffect, useRef, useState, useReducer } from "react";
 import { mountFloatingNavBar } from "../../components/navbar-components/floatingNavBar";
 import { createInfoModal } from "../../components/navbar-components/infoModal";
 import { configureDialogTrigger } from "../../components/navbar-components/modalUtils";
 import { createSettingsModal } from "../../components/navbar-components/settingsModal";
-
 
 function reducer(state: QuizState, action: Action): QuizState {
   switch (action.type) {
@@ -66,10 +65,10 @@ export default function abfrage() {
     }
 
     const infoModalController = createInfoModal({
-      mount: document.body
+      mount: document.body,
     });
     const settingsModalController = createSettingsModal({
-      mount: document.body
+      mount: document.body,
     });
     const navController = mountFloatingNavBar({
       mount: navMountRef.current,
@@ -87,17 +86,18 @@ export default function abfrage() {
       },
       onOpenSettings: () => {
         settingsModalController.open();
-      }
+      },
     });
 
     const infoButton = navController.getInfoButton();
     const settingsButton = navController.getSettingsButton();
     const abfragenButton = navMountRef.current.querySelector<HTMLButtonElement>(
-      '[data-nav-id="abfragen"]'
+      '[data-nav-id="abfragen"]',
     );
-    const karteikastenButton = navMountRef.current.querySelector<HTMLButtonElement>(
-      '[data-nav-id="karteikasten"]'
-    );
+    const karteikastenButton =
+      navMountRef.current.querySelector<HTMLButtonElement>(
+        '[data-nav-id="karteikasten"]',
+      );
 
     configureDialogTrigger(infoButton, "vocab-info-dialog");
     configureDialogTrigger(settingsButton, "vocab-settings-dialog");
@@ -111,7 +111,7 @@ export default function abfrage() {
       infoModalController.destroy();
       settingsModalController.destroy();
     };
-  }, [router]);
+  }, []);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAnswer(e.target.value);
@@ -145,7 +145,7 @@ export default function abfrage() {
             <Result data={state} />
           </div>
         ) : (
-          <div>
+          <>
             <AbfrageCart
               data={currentQuestion}
               onEnter={handleAnswer}
@@ -162,7 +162,7 @@ export default function abfrage() {
                 />
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
       <div ref={navMountRef} />

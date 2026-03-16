@@ -1,23 +1,23 @@
 .body {
   border: none;
   padding: 8px 16px;
-  border-radius: 15px;
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all .12s cubic-bezier(.47, 0, .745, .715);
 }
 
 .body:hover {
-  filter: brightness(0.5);
+  filter: brightness(0.8);
 }
 
 .primary {
-  background: var(--color-primary);
-  color: white;
+  background: var(--primary);
+  color: var(--text-white);
 }
 
 .secondary {
-  background: var(--color-secondary);
-  color: #444;
+  background: var(--primary-strong);
+  color: var(--text-white);
 }
 
 .correct {
