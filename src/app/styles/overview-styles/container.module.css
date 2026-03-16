@@ -1,7 +1,22 @@
+.header {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.title {
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 2rem;
+}
+
 .cardContainer {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 .card {
@@ -56,16 +71,21 @@
 }
 
 .formContainer {
-    margin-bottom: 20px;
-    padding: 15px;
+    margin-bottom: 30px;
+    padding: 20px;
     border: 1px solid var(--border);
-    border-radius: 5px;
+    border-radius: 8px;
     color: var(--text);
     background: color-mix(in srgb, var(--panel) 94%, var(--bg-accent) 6%);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .formContainer h2 {
-    margin-bottom: 15px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 .cardItem {

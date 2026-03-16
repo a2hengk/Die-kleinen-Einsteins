@@ -1,5 +1,6 @@
 .statusbar {
   display: flex;
+  width: 550px;
   gap: 50px;
   justify-content: center;
   align-items: center;
