@@ -36,6 +36,10 @@ export default function SelfStudy() {
     const navController = mountFloatingNavBar({
       mount: navMountRef.current,
       onNavigate: (itemId) => {
+        if (itemId === "karteikasten") {
+          window.location.href = "/";
+        }
+
         if (itemId === "selbstlernen") {
           return;
         }

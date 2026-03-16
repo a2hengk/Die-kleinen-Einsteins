@@ -2,8 +2,6 @@
 
 import styleContainer from "./styles/overview-styles/container.module.css";
 import styleButton from "./styles/overview-styles/button.module.css";
-import Input from "../components/ui/input/input";
-import { Button } from "../components/ui/button/button";
 
 // import navbar
 import { useEffect, useRef, useState } from "react";
@@ -26,6 +24,54 @@ export default function Overview() {
         front: "",
         back: "",
     });
+    const navMountRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!navMountRef.current) {
+            return;
+        }
+
+        const infoModalController = createInfoModal({
+            mount: document.body,
+        });
+        const settingsModalController = createSettingsModal({
+            mount: document.body,
+        });
+        const navController = mountFloatingNavBar({
+            mount: navMountRef.current,
+            onNavigate: (itemId) => {
+                if (itemId === "karteikasten") {
+                    return;
+                }
+
+                if (itemId === "selbstlernen") {
+                    window.location.href = "/selfstudy";
+                }
+
+                if (itemId === "abfragen") {
+                    window.location.href = "/abfrage";
+                }
+            },
+            onOpenInfo: () => {
+                infoModalController.open();
+            },
+            onOpenSettings: () => {
+                settingsModalController.open();
+            },
+        });
+
+        const infoButton = navController.getInfoButton();
+        const settingsButton = navController.getSettingsButton();
+
+        configureDialogTrigger(infoButton, "vocab-info-dialog");
+        configureDialogTrigger(settingsButton, "vocab-settings-dialog");
+
+        return () => {
+            navController.destroy();
+            infoModalController.destroy();
+            settingsModalController.destroy();
+        };
+    }, []);
 
     const addCard = () => {
         if (editingId !== null) {
@@ -83,28 +129,34 @@ export default function Overview() {
             {/* Formular zum Hinzufügen/Bearbeiten */}
             <div className={styleContainer.formContainer}>
                 <h2>{editingId ? "Karte bearbeiten" : "Neue Karte hinzufügen"}</h2>
-
-                <Input
+                <input
+                    type="text"
+                    placeholder="Vorderseite"
                     value={formData.front}
                     onChange={(e) => setFormData((prev) => ({ ...prev, front: e.target.value }))}
+                    className={styleButton.input}
                 />
-
-                <Input
+                <input
+                    type="text"
+                    placeholder="Rückseite"
                     value={formData.back}
                     onChange={(e) => setFormData((prev) => ({ ...prev, back: e.target.value }))}
+                    className={styleButton.input}
                 />
                 <div className={styleButton.buttonGroup}>
-                    <Button
-                        content={editingId ? "Speichern" : "Hinzufügen"}
-                        color="primary"
+                    <button
                         onClick={addCard}
-                    />
+                        className={styleButton.submitButton}
+                    >
+                        {editingId ? "Speichern" : "Hinzufügen"}
+                    </button>
                     {editingId && (
-                        <Button
-                            content="Abbrechen"
-                            color="secondary"
+                        <button
                             onClick={cancelEdit}
-                        />
+                            className={styleButton.cancelButton}
+                        >
+                            Abbrechen
+                        </button>
                     )}
                 </div>
             </div>
@@ -124,23 +176,27 @@ export default function Overview() {
                                     <p><strong>Vorderseite:</strong> {card.front}</p>
                                     <p><strong>Rückseite:</strong> {card.back}</p>
                                 </div>
-                                <Button
-                                    content="Löschen"
-                                    color="secondary"
-                                    onClick={() => {
+                                <button
+                                    className={styleButton.editButton}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         removeCard(card.id);
                                     }}
-                                />
+                                >
+                                    Löschen
+                                </button>
                             </div>
                         </div>
-                        <Button
-                            content="Bearbeiten"
-                            color="secondary"
+                        <button
+                            className={styleButton.editButton}
                             onClick={() => editCard(card.id)}
-                        />
+                        >
+                            Bearbeiten
+                        </button>
                     </div>
                 ))}
             </div>
+            <div ref={navMountRef} />
         </div>
     );
 }

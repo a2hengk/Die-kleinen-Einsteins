@@ -73,6 +73,10 @@ export default function abfrage() {
     const navController = mountFloatingNavBar({
       mount: navMountRef.current,
       onNavigate: (itemId) => {
+        if (itemId === "karteikasten") {
+          router.push("/");
+        }
+
         if (itemId === "selbstlernen") {
           router.push("/selfstudy");
         }
