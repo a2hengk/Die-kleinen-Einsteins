@@ -24,20 +24,34 @@ export const AbfrageCart = ({
       <div className={styles.question}>{data.question}</div>
       {state.isAnswered ? (
         <>
-          <Answer
-            prompt="Ihre Antwort"
-            text={isFilled ? state.answers[state.currentIndex] : "Skipped"}
-            color="current"
-            span_color="promt_current"
-            isCurrent={true}
-          />
+          {state.answers[state.currentIndex] === data.correct ? (
+            <Answer
+              prompt="Ihre Antwort"
+              text={
+                isFilled ? state.answers[state.currentIndex] : "Skipped"
+              }
+              color="correct"
+              span_color="promt_correct"
+              isCorrect={true}
+            />
+          ) : (
+            <Answer
+              prompt="Ihre Antwort"
+              text={
+                isFilled ? state.answers[state.currentIndex] : "Skipped"
+              }
+              color="wrong"
+              span_color="promt_wrong"
+              isCorrect={false}
+            />
+          )}
 
           <Answer
             prompt="Richtige Antwort"
             text={data.correct}
             color="correct"
             span_color="promt_correct"
-            isCurrent={false}
+            isCorrect={true}
           />
         </>
       ) : (

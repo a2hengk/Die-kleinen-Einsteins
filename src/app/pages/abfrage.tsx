@@ -9,12 +9,11 @@ import { useRouter } from "next/navigation";
 import { Result } from "@/components/abfrage/result";
 
 // import navbar
-import { useEffect, useRef, useState, useReducer} from "react";
+import { useEffect, useRef, useState, useReducer } from "react";
 import { mountFloatingNavBar } from "../../components/navbar-components/floatingNavBar";
 import { createInfoModal } from "../../components/navbar-components/infoModal";
 import { configureDialogTrigger } from "../../components/navbar-components/modalUtils";
 import { createSettingsModal } from "../../components/navbar-components/settingsModal";
-
 
 function reducer(state: QuizState, action: Action): QuizState {
   switch (action.type) {
@@ -66,10 +65,10 @@ export default function abfrage() {
     }
 
     const infoModalController = createInfoModal({
-      mount: document.body
+      mount: document.body,
     });
     const settingsModalController = createSettingsModal({
-      mount: document.body
+      mount: document.body,
     });
     const navController = mountFloatingNavBar({
       mount: navMountRef.current,
@@ -87,17 +86,18 @@ export default function abfrage() {
       },
       onOpenSettings: () => {
         settingsModalController.open();
-      }
+      },
     });
 
     const infoButton = navController.getInfoButton();
     const settingsButton = navController.getSettingsButton();
     const abfragenButton = navMountRef.current.querySelector<HTMLButtonElement>(
-      '[data-nav-id="abfragen"]'
+      '[data-nav-id="abfragen"]',
     );
-    const karteikastenButton = navMountRef.current.querySelector<HTMLButtonElement>(
-      '[data-nav-id="karteikasten"]'
-    );
+    const karteikastenButton =
+      navMountRef.current.querySelector<HTMLButtonElement>(
+        '[data-nav-id="karteikasten"]',
+      );
 
     configureDialogTrigger(infoButton, "vocab-info-dialog");
     configureDialogTrigger(settingsButton, "vocab-settings-dialog");
