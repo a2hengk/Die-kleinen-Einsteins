@@ -1,5 +1,5 @@
 .primary {
-    background-color: var(--color-primary);
+    background-color: var(--color-primary-background);
     perspective: 1000px;
     display: flex;
     flex-direction: column;
@@ -41,7 +41,3 @@
     flex: 1;
 }
 
-.showAnswer {
-    width: 100%;
-    margin-top: 10px;
-}

@@ -12,9 +12,11 @@
 }
 
 :root {
-  --color-primary: #EAEFBD;
+  --color-primary-background: #FFEDCF;
   --color-secondary: #E8DEF8;
   --color-accent: #ffcc00;
+
+  --color-button-primary: #000AFF;
 
   --color-text: #111111;
   --color-gray: #777777;
