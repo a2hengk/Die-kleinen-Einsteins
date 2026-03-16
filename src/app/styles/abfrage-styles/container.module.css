@@ -1,14 +1,6 @@
-.header{
-    position: sticky;
-    top: 0;
-    width: 100%;
-    z-index: 901;
-    display: flex;
-    justify-content: space-between;
-    padding: 1.5rem 0;
-}
 .container{
     max-width: 550px;
+    width: 100%;
     margin: 0 auto;
 }
 .action_info{

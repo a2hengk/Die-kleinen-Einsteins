@@ -23,7 +23,7 @@ export const AbfrageCart = ({
     <div className={styles.container}>
       <div className={styles.question}>{data.question}</div>
       {state.isAnswered ? (
-        <div>
+        <>
           <Answer
             prompt="Ihre Antwort"
             text={isFilled ? state.answers[state.currentIndex] : "Skipped"}
@@ -39,18 +39,18 @@ export const AbfrageCart = ({
             span_color="promt_correct"
             isCurrent={false}
           />
-        </div>
+        </>
       ) : (
-        <div>
+        <>
           <Input
             onChange={onChange}
             value={state.answers[state.currentIndex] ?? ""}
             onEnter={onEnter}
           />
           <div className={styles.action}>
-            <Button content="Answer" onClick={onEnter} />
+            <Button content="Answer" onClick={onEnter} color="secondary" />
           </div>
-        </div>
+        </>
       )}
     </div>
   );

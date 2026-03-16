@@ -10,14 +10,14 @@ export const Result = ({ data }: PageProps) => {
   return (
     <>
       <div className={styles.motivation}>
-        <span>Keep going</span>
+        <span>Keep going you were great!</span>
       </div>
       <div className={styles.info_container}>
         <DonutChart data={[data.score, data.fail]} />
         <div className={styles.info_text}>
-          <p>Richtig: {data.score}</p>
-          <p>Falsch: {data.fail}</p>
-          <p>Übersprungen: -</p>
+          <p className={styles.correct}>Richtig: {data.score}</p>
+          <p className={styles.wrong}>Falsch: {data.fail}</p>
+          <p className={styles.skip}>Übersprungen: -</p>
         </div>
       </div>
     </>

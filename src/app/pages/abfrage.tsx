@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button/button";
-import styles from "./../styles/abfrage-styles/blast.module.css";
+import styles from "../styles/abfrage-styles/container.module.css";
 import { AbfrageCart } from "@/components/ui/cart/abfrage/abfrage_cart";
 import { initialQuizData, initialQuizState } from "@/lib/constants";
 import { Action, QuizState } from "@/lib/types";
@@ -111,7 +111,7 @@ export default function abfrage() {
       infoModalController.destroy();
       settingsModalController.destroy();
     };
-  }, [router]);
+  }, []);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAnswer(e.target.value);
@@ -145,7 +145,7 @@ export default function abfrage() {
             <Result data={state} />
           </div>
         ) : (
-          <div>
+          <>
             <AbfrageCart
               data={currentQuestion}
               onEnter={handleAnswer}
@@ -162,7 +162,7 @@ export default function abfrage() {
                 />
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
       <div ref={navMountRef} />
