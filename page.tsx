@@ -41,7 +41,7 @@ export default function Overview() {
             mount: navMountRef.current,
             onNavigate: (itemId) => {
                 if (itemId === "karteikasten") {
-                    window.location.href = "/";
+                    return;
                 }
 
                 if (itemId === "selbstlernen") {

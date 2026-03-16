@@ -2,6 +2,7 @@
 
 import stylesContainer from '../styles/selfstudy-styles/container.module.css';
 import StatusBar from '../../components/ui/statusbar/statusbar';
+import { Button } from '../../components/ui/button/button';
 
 // import navbar
 import { useEffect, useRef, useState } from "react";
@@ -90,14 +91,14 @@ export default function SelfStudy() {
         {isFlipped ? 'Flipped Content' : 'Original Content'}
       </div>
       <div className={stylesContainer.buttons}>
-        <button className={stylesContainer.right} onClick={() => {
+        <Button content="Correct" color="primary" onClick={() => {
           setCorrectCount(correctCount + 1);
           if (currentQuestion < totalQuestions) setCurrentQuestion(currentQuestion + 1);
-        }}>Correct</button>
-        <button className={stylesContainer.wrong} onClick={() => {
+        }} />
+        <Button content="Wrong" color="secondary" onClick={() => {
           setWrongCount(wrongCount + 1);
           if (currentQuestion < totalQuestions) setCurrentQuestion(currentQuestion + 1);
-        }}>Wrong</button>
+        }} />
       </div>
       <div ref={navMountRef} />
     </div>
