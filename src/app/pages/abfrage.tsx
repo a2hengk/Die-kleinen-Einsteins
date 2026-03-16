@@ -59,6 +59,16 @@ export default function abfrage() {
   const router = useRouter();
   const currentQuestion = initialQuizData[state.currentIndex];
 
+  const focusExerciseInput = () => {
+    if (document.documentElement.getAttribute("data-auto-focus-input") !== "true") {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      document.querySelector<HTMLInputElement>('input:not([type="hidden"]):not([disabled])')?.focus();
+    });
+  };
+
   useEffect(() => {
     if (!navMountRef.current) {
       return;
@@ -116,6 +126,26 @@ export default function abfrage() {
       settingsModalController.destroy();
     };
   }, []);
+
+  useEffect(() => {
+    if (!state.isAnswered) {
+      focusExerciseInput();
+    }
+  }, [state.currentIndex, state.isAnswered]);
+
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      if (!state.isAnswered) {
+        focusExerciseInput();
+      }
+    };
+
+    window.addEventListener("vocab-settings-change", handleSettingsChange);
+
+    return () => {
+      window.removeEventListener("vocab-settings-change", handleSettingsChange);
+    };
+  }, [state.currentIndex, state.isAnswered]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAnswer(e.target.value);

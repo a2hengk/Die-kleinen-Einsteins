@@ -56,6 +56,8 @@ const applyPreferences = (settings: AppSettings): void => {
     "data-reduced-motion",
     String(settings.accessibility.reducedMotion || preferredReducedMotion())
   );
+  root.setAttribute("data-auto-focus-input", String(settings.trainer.autoFocusInput));
+  window.dispatchEvent(new CustomEvent("vocab-settings-change"));
 };
 
 const read = (): AppSettings => {
@@ -369,6 +371,7 @@ export const createSettingsModal = (
   const passwordFields = [currentPw, newPw, confirmPw] as const;
   const previewInputs = [
     darkMode.input,
+    autoFocus.input,
     largeText.input,
     reducedMotion.input,
     highContrast.input
@@ -412,6 +415,10 @@ export const createSettingsModal = (
       ui: {
         ...state.ui,
         theme: darkMode.input.checked ? "dark" : "light"
+      },
+      trainer: {
+        ...state.trainer,
+        autoFocusInput: autoFocus.input.checked
       },
       accessibility: {
         ...state.accessibility,
@@ -514,3 +521,6 @@ export const createSettingsModal = (
     }
   };
 };
+
+
+

@@ -19,6 +19,15 @@ export default function SelfStudy() {
   const totalQuestions = 10;
   const navMountRef = useRef<HTMLDivElement | null>(null);
 
+  const focusExerciseInput = () => {
+    if (document.documentElement.getAttribute("data-auto-focus-input") !== "true") {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      document.querySelector<HTMLInputElement>('input:not([type="hidden"]):not([disabled])')?.focus();
+    });
+  };
 
   // Navbar setup
 
@@ -78,6 +87,22 @@ export default function SelfStudy() {
       settingsModalController.destroy();
     };
   }, []);
+
+  useEffect(() => {
+    focusExerciseInput();
+  }, [currentQuestion]);
+
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      focusExerciseInput();
+    };
+
+    window.addEventListener("vocab-settings-change", handleSettingsChange);
+
+    return () => {
+      window.removeEventListener("vocab-settings-change", handleSettingsChange);
+    };
+  }, [currentQuestion]);
 
   // end Navbar setup
 

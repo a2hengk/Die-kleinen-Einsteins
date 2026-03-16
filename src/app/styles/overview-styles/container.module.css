@@ -8,11 +8,13 @@
     position: relative;
     width: 200px;
     height: 150px;
-    background-color: #fff;
-    border: 2px solid #000;
+    background-color: var(--panel);
+    border: 2px solid var(--border);
     border-radius: 10px;
     cursor: pointer;
     transition: all 100ms ease;
+    color: var(--text);
+    box-shadow: var(--shadow);
 }
 
 .card:hover {
@@ -31,33 +33,35 @@
     position: relative;
     width: 200px;
     height: 150px;
-    background-color: #fff;
-    border: 2px solid #000;
+    background-color: var(--panel);
+    border: 2px solid var(--border);
     border-radius: 10px;
     cursor: pointer;
     transition: all 100ms ease;
+    color: var(--text);
 }
 
 .card-new:hover {
-    background-color: #ffffff;
+    background-color: var(--panel);
     width: 220px;
     height: 170px;
     transition: 100ms;
-}   
+}
 
 .card-new.clicked {
     width: 800px;
     height: 650px;
-    background-color: #ffffff;
+    background-color: var(--panel);
     transition: all 100ms ease;
 }
 
 .formContainer {
     margin-bottom: 20px;
     padding: 15px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
     border-radius: 5px;
-    color:#000;
+    color: var(--text);
+    background: color-mix(in srgb, var(--panel) 94%, var(--bg-accent) 6%);
 }
 
 .formContainer h2 {
@@ -71,27 +75,27 @@
 }
 
 .cardContent {
-    color:#000;
+    color: var(--text);
     padding: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 5px;
     min-height: 100px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    background-color: #f9f9f9;
+    background-color: color-mix(in srgb, var(--panel) 92%, var(--bg-accent) 8%);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .cardContent:hover {
-    background-color: #f0f0f0;
+    background-color: color-mix(in srgb, var(--panel) 86%, var(--bg-accent) 14%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .cardContent p {
     margin: 8px 0;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 .cardContent strong {

@@ -16,6 +16,9 @@
   --radius-sm: 9px;
   --base-font-size: 16px;
   --transition: 180ms ease;
+  --color-text: var(--text);
+  --color-beige: var(--bg);
+  --color-primary-background: var(--bg);
 }
 
 :root[data-theme="dark"] {
@@ -86,7 +89,9 @@ html {
 body {
   overflow-x: hidden;
   color: var(--text);
+  background: var(--bg);
   line-height: 1.5;
+  font-size: 1rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -104,7 +109,8 @@ p {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -115,6 +121,14 @@ button {
 :focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
+}
+
+:root[data-large-text="true"] body {
+  font-size: 1.125rem;
+}
+
+:root[data-high-contrast="true"] body {
+  letter-spacing: 0.01em;
 }
 
 .vocab-nav {
@@ -444,3 +458,4 @@ button {
   transition: none !important;
   scroll-behavior: auto !important;
 }
+

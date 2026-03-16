@@ -29,7 +29,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      data-theme="light"
+      data-large-text="false"
+      data-high-contrast="false"
+      data-reduced-motion="false"
+      data-auto-focus-input="true"
+      suppressHydrationWarning
+    >
       <body className={`${styles.body} ${roboto.className}`}>
         <main className={styles.main}>{children}</main>
       </body>
