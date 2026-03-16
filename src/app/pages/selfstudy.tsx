@@ -1,7 +1,7 @@
 "use client";
 
 import stylesContainer from '../styles/selfstudy-styles/container.module.css';
-import stylesStatusbar from '../styles/selfstudy-styles/statusbar.module.css';
+import StatusBar from '../../components/ui/statusbar/statusbar';
 
 // import navbar
 import { useEffect, useRef, useState } from "react";
@@ -76,11 +76,11 @@ export default function SelfStudy() {
 
   return (
     <div className={stylesContainer.primary}>
-      <div className={stylesStatusbar.statusbar}>
-        <span>Correct: <span className={stylesStatusbar.correctCount}>{correctCount}</span></span>
-        <span>Wrong: <span className={stylesStatusbar.wrongCount}>{wrongCount}</span></span>
-      </div>
-      <div className={stylesContainer.card} onClick={() => setIsFlipped(!isFlipped)}>
+      <StatusBar correctCount={correctCount} wrongCount={wrongCount} />
+      <div 
+        className={`${stylesContainer.card} ${isFlipped ? stylesContainer.flipover : ''}`}
+        onClick={() => setIsFlipped(!isFlipped)}
+      >
         {isFlipped ? 'Flipped Content' : 'Original Content'}
       </div>
       <div className={stylesContainer.buttons}>

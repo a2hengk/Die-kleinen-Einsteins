@@ -1,0 +1,62 @@
+.statusbar {
+  display: flex;
+  gap: 50px;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  margin: 20px auto;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.label {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.boxesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  min-height: 30px;
+}
+
+.box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  animation: popIn 0.3s ease-out;
+}
+
+.boxCorrect {
+  background-color: #4caf50;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+}
+
+.boxWrong {
+  background-color: #ff6b6b;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
