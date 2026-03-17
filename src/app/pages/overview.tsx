@@ -2,7 +2,6 @@
 
 import styleContainer from "../styles/overview-styles/container.module.css";
 import styleButton from "../styles/overview-styles/button.module.css";
-import styleBody from "../styles/overview-styles/body.module.css";
 
 // import navbar
 import { useEffect, useRef, useState } from "react";
