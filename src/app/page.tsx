@@ -1,7 +1,6 @@
 "use client";
 
 import styleContainer from "./styles/overview-styles/container.module.css";
-import styleButton from "./styles/overview-styles/button.module.css";
 import { Button } from "../components/ui/button/button";
 import Input from "../components/ui/input/input";
 
@@ -139,13 +138,18 @@ export default function Overview() {
                     value={formData.back}
                     onChange={(e) => setFormData((prev) => ({ ...prev, back: e.target.value }))}
                 />
-                <div className={styleButton.buttonGroup}>
-                    <Button content={editingId ? "Speichern" : "Hinzufügen"} onClick={addCard} />
-                    {editingId && (
-                        <Button content="Abbrechen" onClick={cancelEdit} color="secondary" />
-                    )}
-                </div>
+                <Button content={editingId ? "Speichern" : "Hinzufügen"} onClick={addCard} />
+                {editingId && (
+                    <Button content="Abbrechen" onClick={cancelEdit} color="secondary" />
+                )}
             </div>
+
+            {clicked.length > 0 && (
+                <div 
+                    className={styleContainer.backdrop} 
+                    onClick={() => setClicked([])}
+                />
+            )}
 
             {/* Kartenliste */}
             <div className={styleContainer.cardContainer}>

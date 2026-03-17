@@ -14,9 +14,14 @@ export const Button = ({
   onClick,
   border = "",
 }: ButtonProps) => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClick?.();
+  };
+
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       className={`${styles.body} ${styles[color]} ${styles[border]}`}
     >
       {content}

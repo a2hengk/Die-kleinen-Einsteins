@@ -17,57 +17,40 @@
     gap: 20px;
     justify-content: center;
     margin-top: 20px;
+    padding: 0 10px;
 }
 
 .card {
     position: relative;
-    width: 200px;
-    height: 150px;
+    width: 220px;
+    height: 160px;
     background-color: var(--panel);
     border: 2px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 100ms ease;
+    transition: all 0.2s cubic-bezier(0.47, 0, 0.745, 0.715);
     color: var(--text);
     box-shadow: var(--shadow);
+    overflow: hidden;
 }
 
 .card:hover {
-    width: 220px;
-    height: 170px;
-    transition: 100ms;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-color: var(--focus);
 }
 
 .card.clicked {
-    width: 300px;
-    height: 250px;
-    transition: all 100ms ease;
-}
-
-.card-new {
-    position: relative;
-    width: 200px;
-    height: 150px;
-    background-color: var(--panel);
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 100ms ease;
-    color: var(--text);
-}
-
-.card-new:hover {
-    background-color: var(--panel);
-    width: 220px;
-    height: 170px;
-    transition: 100ms;
-}
-
-.card-new.clicked {
-    width: 800px;
-    height: 650px;
-    background-color: var(--panel);
-    transition: all 100ms ease;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 600px;
+    height: auto;
+    max-height: 80vh;
+    z-index: 1000;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .formContainer {
@@ -91,34 +74,49 @@
 .cardItem {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    width: 100%;
+    max-width: 220px;
 }
 
 .cardContent {
     color: var(--text);
-    padding: 20px;
+    padding: 16px;
     border: 1px solid var(--border);
-    border-radius: 5px;
-    min-height: 100px;
+    border-radius: 8px;
+    min-height: 120px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 12px;
     background-color: color-mix(in srgb, var(--panel) 92%, var(--bg-accent) 8%);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.cardContent:hover {
-    background-color: color-mix(in srgb, var(--panel) 86%, var(--bg-accent) 14%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.card:hover .cardContent {
+    background-color: color-mix(in srgb, var(--panel) 88%, var(--bg-accent) 12%);
+}
+
+.card.clicked .cardContent {
+    background-color: var(--panel);
+    padding: 30px;
+    border-radius: 12px;
+    min-height: auto;
+    gap: 20px;
 }
 
 .cardContent p {
-    margin: 8px 0;
-    font-size: 0.875rem;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    word-wrap: break-word;
 }
 
 .cardContent strong {
     display: block;
-    margin-bottom: 4px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: var(--focus);
 }
