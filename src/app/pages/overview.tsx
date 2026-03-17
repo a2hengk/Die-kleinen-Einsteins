@@ -1,7 +1,8 @@
 "use client";
 
 import styleContainer from "../styles/overview-styles/container.module.css";
-import styleButton from "../styles/overview-styles/button.module.css";
+import { Button } from "../../components/ui/button/button";
+import Input from "../../components/ui/input/input";
 
 // import navbar
 import { useEffect, useRef, useState } from "react";
@@ -24,6 +25,54 @@ export default function Overview() {
         front: "",
         back: "",
     });
+    const navMountRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!navMountRef.current) {
+            return;
+        }
+
+        const infoModalController = createInfoModal({
+            mount: document.body,
+        });
+        const settingsModalController = createSettingsModal({
+            mount: document.body,
+        });
+        const navController = mountFloatingNavBar({
+            mount: navMountRef.current,
+            onNavigate: (itemId) => {
+                if (itemId === "karteikasten") {
+                    return;
+                }
+
+                if (itemId === "selbstlernen") {
+                    window.location.href = "/selfstudy";
+                }
+
+                if (itemId === "abfragen") {
+                    window.location.href = "/abfrage";
+                }
+            },
+            onOpenInfo: () => {
+                infoModalController.open();
+            },
+            onOpenSettings: () => {
+                settingsModalController.open();
+            },
+        });
+
+        const infoButton = navController.getInfoButton();
+        const settingsButton = navController.getSettingsButton();
+
+        configureDialogTrigger(infoButton, "vocab-info-dialog");
+        configureDialogTrigger(settingsButton, "vocab-settings-dialog");
+
+        return () => {
+            navController.destroy();
+            infoModalController.destroy();
+            settingsModalController.destroy();
+        };
+    }, []);
 
     const addCard = () => {
         if (editingId !== null) {
@@ -81,46 +130,34 @@ export default function Overview() {
             {/* Formular zum Hinzufügen/Bearbeiten */}
             <div className={styleContainer.formContainer}>
                 <h2>{editingId ? "Karte bearbeiten" : "Neue Karte hinzufügen"}</h2>
-                <input
-                    type="text"
-                    placeholder="Vorderseite"
+                <Input
                     value={formData.front}
                     onChange={(e) => setFormData((prev) => ({ ...prev, front: e.target.value }))}
-                    className={styleButton.input}
                 />
-                <input
-                    type="text"
-                    placeholder="Rückseite"
+                <Input
                     value={formData.back}
                     onChange={(e) => setFormData((prev) => ({ ...prev, back: e.target.value }))}
-                    className={styleButton.input}
                 />
-                <div className={styleButton.buttonGroup}>
-                    <button
-                        onClick={addCard}
-                        className={styleButton.submitButton}
-                    >
-                        {editingId ? "Speichern" : "Hinzufügen"}
-                    </button>
-                    {editingId && (
-                        <button
-                            onClick={cancelEdit}
-                            className={styleButton.cancelButton}
-                        >
-                            Abbrechen
-                        </button>
-                    )}
-                </div>
+                <Button content={editingId ? "Speichern" : "Hinzufügen"} onClick={addCard} />
+                {editingId && (
+                    <Button content="Abbrechen" onClick={cancelEdit} color="secondary" />
+                )}
             </div>
+
+            {clicked.length > 0 && (
+                <div 
+                    className={styleContainer.backdrop} 
+                    onClick={() => setClicked([])}
+                />
+            )}
 
             {/* Kartenliste */}
             <div className={styleContainer.cardContainer}>
                 {cards.map((card) => (
                     <div key={card.id} className={styleContainer.cardItem}>
                         <div
-                            className={`${styleContainer.card} ${
-                                clicked.includes(card.id) ? "clicked" : ""
-                            }`}
+                            className={`${styleContainer.card} ${clicked.includes(card.id) ? "clicked" : ""
+                                }`}
                             onClick={() => toggleCard(card.id)}
                         >
                             <div className={styleContainer.cardContent}>
@@ -128,26 +165,14 @@ export default function Overview() {
                                     <p><strong>Vorderseite:</strong> {card.front}</p>
                                     <p><strong>Rückseite:</strong> {card.back}</p>
                                 </div>
-                                <button
-                                    className={styleButton.editButton}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        removeCard(card.id);
-                                    }}
-                                >
-                                    Löschen
-                                </button>
+                                <Button content="Löschen" onClick={() => removeCard(card.id)} />
                             </div>
                         </div>
-                        <button
-                            className={styleButton.editButton}
-                            onClick={() => editCard(card.id)}
-                        >
-                            Bearbeiten
-                        </button>
+                        <Button content="Bearbeiten" onClick={() => editCard(card.id)} />
                     </div>
                 ))}
             </div>
+            <div ref={navMountRef} />
         </div>
     );
 }
