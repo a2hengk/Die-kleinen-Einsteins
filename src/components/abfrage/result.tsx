@@ -17,7 +17,7 @@ export const Result = ({ data }: PageProps) => {
         <div className={styles.info_text}>
           <p className={styles.correct}>Richtig: {data.score}</p>
           <p className={styles.wrong}>Falsch: {data.fail}</p>
-          <p className={styles.skip}>Übersprungen: -</p>
+          <p className={styles.skip}>Übersprungen: {data.skip}</p>
         </div>
       </div>
     </>

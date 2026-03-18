@@ -20,11 +20,16 @@ function reducer(state: QuizState, action: Action): QuizState {
     case "ANSWER":
       const updatedAnswers = [...state.answers];
       updatedAnswers[state.currentIndex] = action.answer;
+      console.log(state.skip);
       return {
         ...state,
         isAnswered: true,
         score: action.payload ? state.score + 1 : state.score,
-        fail: action.payload ? state.fail : state.fail + 1,
+        fail:
+          action.payload || action.answer.trim() !== ""
+            ? state.fail
+            : state.fail + 1,
+        skip: action.answer.trim() === "" ? state.skip + 1 : state.skip,
         answers: updatedAnswers,
         results: [...state.results, action.payload ? "correct" : "wrong"],
       };
@@ -60,12 +65,18 @@ export default function abfrage() {
   const currentQuestion = initialQuizData[state.currentIndex];
 
   const focusExerciseInput = () => {
-    if (document.documentElement.getAttribute("data-auto-focus-input") !== "true") {
+    if (
+      document.documentElement.getAttribute("data-auto-focus-input") !== "true"
+    ) {
       return;
     }
 
     window.requestAnimationFrame(() => {
-      document.querySelector<HTMLInputElement>('input:not([type="hidden"]):not([disabled])')?.focus();
+      document
+        .querySelector<HTMLInputElement>(
+          'input:not([type="hidden"]):not([disabled])',
+        )
+        ?.focus();
     });
   };
 
@@ -164,6 +175,7 @@ export default function abfrage() {
   };
 
   const handleNext = () => {
+    setAnswer("");
     if (state.currentIndex + 1 < initialQuizData.length) {
       dispatch({ type: "NEXT" });
     } else {

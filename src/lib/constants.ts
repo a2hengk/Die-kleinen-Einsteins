@@ -4,6 +4,7 @@ export const initialQuizState: QuizState = {
   currentIndex: 0,
   score: 0,
   fail: 0,
+  skip: 0,
   isAnswered: false,
   answers: [],
   results: []

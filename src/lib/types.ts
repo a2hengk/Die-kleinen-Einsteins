@@ -15,6 +15,7 @@ export type QuizState = {
   currentIndex: number;
   score: number;
   fail: number;
+  skip: number;
   isAnswered: boolean;
   answers: (string | null)[];
   results: ("correct" | "wrong" | "skipped")[]

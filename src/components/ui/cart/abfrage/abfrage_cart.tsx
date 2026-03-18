@@ -27,9 +27,7 @@ export const AbfrageCart = ({
           {state.answers[state.currentIndex] === data.correct ? (
             <Answer
               prompt="Ihre Antwort"
-              text={
-                isFilled ? state.answers[state.currentIndex] : "Skipped"
-              }
+              text={state.answers[state.currentIndex]}
               color="correct"
               span_color="promt_correct"
               isCorrect={true}
@@ -37,9 +35,7 @@ export const AbfrageCart = ({
           ) : (
             <Answer
               prompt="Ihre Antwort"
-              text={
-                isFilled ? state.answers[state.currentIndex] : "Skipped"
-              }
+              text={isFilled ? state.answers[state.currentIndex] : "Skipped"}
               color="wrong"
               span_color="promt_wrong"
               isCorrect={false}
