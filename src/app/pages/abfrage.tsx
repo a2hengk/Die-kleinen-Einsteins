@@ -20,7 +20,6 @@ function reducer(state: QuizState, action: Action): QuizState {
     case "ANSWER":
       const updatedAnswers = [...state.answers];
       updatedAnswers[state.currentIndex] = action.answer;
-      console.log(state.skip);
       return {
         ...state,
         isAnswered: true,
