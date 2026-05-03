@@ -3,8 +3,8 @@
 // ─────────────────────────────────────────────
 // CSS-Module für Layout/Container und Buttons
 // ─────────────────────────────────────────────
-import styleContainer from "././styles/overview-styles/container.module.css";
-import styleButton from "././styles/overview-styles/button.module.css";
+import styleContainer from "../styles/overview-styles/container.module.css";
+import styleButton from "../styles/overview-styles/button.module.css";
 import { Button } from "@/components/ui/button/button";
 
 // ─────────────────────────────────────────────
