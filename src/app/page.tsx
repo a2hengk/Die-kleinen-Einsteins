@@ -2,6 +2,7 @@
 
 import styleContainer from "./styles/overview-styles/container.module.css";
 import styleButton from "./styles/overview-styles/button.module.css";
+import { Button } from "@/components/ui/button/button"; 
 
 // import navbar
 import { useEffect, useRef, useState } from "react";
@@ -144,19 +145,17 @@ export default function Overview() {
                     className={styleButton.input}
                 />
                 <div className={styleButton.buttonGroup}>
-                    <button
+                    <Button
+                        content={editingId ? "Speichern" : "Hinzufügen"}
+                        color="primary"
                         onClick={addCard}
-                        className={styleButton.submitButton}
-                    >
-                        {editingId ? "Speichern" : "Hinzufügen"}
-                    </button>
+                    />
                     {editingId && (
-                        <button
+                        <Button
+                            content="Abbrechen"
+                            color="secondary"
                             onClick={cancelEdit}
-                            className={styleButton.cancelButton}
-                        >
-                            Abbrechen
-                        </button>
+                        />
                     )}
                 </div>
             </div>
@@ -176,23 +175,18 @@ export default function Overview() {
                                     <p><strong>Vorderseite:</strong> {card.front}</p>
                                     <p><strong>Rückseite:</strong> {card.back}</p>
                                 </div>
-                                <button
-                                    className={styleButton.editButton}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        removeCard(card.id);
-                                    }}
-                                >
-                                    Löschen
-                                </button>
+                                <Button
+                                    content="Löschen"
+                                    color="secondary"
+                                    onClick={() => removeCard(card.id)}
+                                />
                             </div>
                         </div>
-                        <button
-                            className={styleButton.editButton}
+                        <Button
+                            content="Bearbeiten"
+                            color="primary"
                             onClick={() => editCard(card.id)}
-                        >
-                            Bearbeiten
-                        </button>
+                        />
                     </div>
                 ))}
             </div>
