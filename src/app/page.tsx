@@ -6,6 +6,7 @@
 import styleContainer from "./styles/overview-styles/container.module.css";
 import styleButton from "./styles/overview-styles/button.module.css";
 import { Button } from "@/components/ui/button/button";
+import Input from "@/components/ui/input/input";
 
 // ─────────────────────────────────────────────
 // Navbar-Komponenten und Hilfsfunktionen
@@ -154,49 +155,29 @@ export default function Overview() {
     return (
         <div className={styleContainer.header}>
             <h1 className={styleContainer.title}>Karteikartenuebersicht</h1>
-
-            {/* Formular zum Erstellen oder Bearbeiten einer Karte */}
+            {/* Formular zum Hinzufügen/Bearbeiten */}
             <div className={styleContainer.formContainer}>
                 <h2>{editingId ? "Karte bearbeiten" : "Neue Karte hinzufügen"}</h2>
-
-                {/* Eingabefeld für die Vorderseite */}
-                <input
-                    type="text"
-                    placeholder="Vorderseite"
+                <Input
                     value={formData.front}
-                    onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, front: e.target.value }))
-                    }
-                    className={styleButton.input}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, front: e.target.value }))}
                 />
-
-                {/* Eingabefeld für die Rückseite */}
-                <input
-                    type="text"
-                    placeholder="Rückseite"
+                <Input
                     value={formData.back}
-                    onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, back: e.target.value }))
-                    }
-                    className={styleButton.input}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, back: e.target.value }))}
                 />
-
-                {/* Buttons: Speichern/Hinzufügen + optional Abbrechen im Bearbeitungsmodus */}
-                <div className={styleButton.buttonGroup}>
-                    <Button
-                        content={editingId ? "Speichern" : "Hinzufügen"}
-                        color="primary"
-                        onClick={addCard}
-                    />
-                    {editingId && (
-                        <Button
-                            content="Abbrechen"
-                            color="secondary"
-                            onClick={cancelEdit}
-                        />
-                    )}
-                </div>
+                <Button content={editingId ? "Speichern" : "Hinzufügen"} onClick={addCard} />
+                {editingId && (
+                    <Button content="Abbrechen" onClick={cancelEdit} color="secondary" />
+                )}
             </div>
+
+            {clicked.length > 0 && (
+                <div 
+                    className={styleContainer.backdrop} 
+                    onClick={() => setClicked([])}
+                />
+            )}
 
             {/* Liste aller Karteikarten */}
             <div className={styleContainer.cardContainer}>
