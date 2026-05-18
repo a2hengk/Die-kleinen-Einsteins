@@ -1,100 +1,122 @@
+.header {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.title {
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 2rem;
+}
+
 .cardContainer {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+    padding: 0 10px;
 }
 
 .card {
     position: relative;
-    width: 200px;
-    height: 150px;
-    background-color: #fff;
-    border: 2px solid #000;
-    border-radius: 10px;
+    width: 220px;
+    height: 160px;
+    background-color: var(--panel);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 100ms ease;
+    transition: all 0.2s cubic-bezier(0.47, 0, 0.745, 0.715);
+    color: var(--text);
+    box-shadow: var(--shadow);
+    overflow: hidden;
 }
 
 .card:hover {
-    width: 220px;
-    height: 170px;
-    transition: 100ms;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-color: var(--focus);
 }
 
 .card.clicked {
-    width: 300px;
-    height: 250px;
-    transition: all 100ms ease;
-}
-
-.card-new {
-    position: relative;
-    width: 200px;
-    height: 150px;
-    background-color: #fff;
-    border: 2px solid #000;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 100ms ease;
-}
-
-.card-new:hover {
-    background-color: #ffffff;
-    width: 220px;
-    height: 170px;
-    transition: 100ms;
-}   
-
-.card-new.clicked {
-    width: 800px;
-    height: 650px;
-    background-color: #ffffff;
-    transition: all 100ms ease;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 600px;
+    height: auto;
+    max-height: 80vh;
+    z-index: 1000;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .formContainer {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    color:#000;
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    background: color-mix(in srgb, var(--panel) 94%, var(--bg-accent) 6%);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .formContainer h2 {
-    margin-bottom: 15px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 .cardItem {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    width: 100%;
+    max-width: 220px;
 }
 
 .cardContent {
-    color:#000;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    min-height: 100px;
+    color: var(--text);
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    min-height: 120px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    background-color: #f9f9f9;
+    justify-content: center;
+    gap: 12px;
+    background-color: color-mix(in srgb, var(--panel) 92%, var(--bg-accent) 8%);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.cardContent:hover {
-    background-color: #f0f0f0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.card:hover .cardContent {
+    background-color: color-mix(in srgb, var(--panel) 88%, var(--bg-accent) 12%);
+}
+
+.card.clicked .cardContent {
+    background-color: var(--panel);
+    padding: 30px;
+    border-radius: 12px;
+    min-height: auto;
+    gap: 20px;
 }
 
 .cardContent p {
-    margin: 8px 0;
-    font-size: 14px;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    word-wrap: break-word;
 }
 
 .cardContent strong {
     display: block;
-    margin-bottom: 4px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: var(--focus);
 }
