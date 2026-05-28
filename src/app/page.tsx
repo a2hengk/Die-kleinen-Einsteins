@@ -7,6 +7,7 @@ import styleContainer from "./styles/overview-styles/container.module.css";
 import styleButton from "./styles/overview-styles/button.module.css";
 import { Button } from "@/components/ui/button/button";
 import Input from "@/components/ui/input/input";
+import { loadFlashcards, saveFlashcards } from "@/lib/flashcards";
 
 // ─────────────────────────────────────────────
 // Navbar-Komponenten und Hilfsfunktionen
@@ -42,10 +43,10 @@ export default function Overview() {
         front: "",
         back: "",
     });
+    const [isHydrated, setIsHydrated] = useState(false);
 
     // Ref für den DOM-Einhängepunkt der Navbar
     const navMountRef = useRef<HTMLDivElement | null>(null);
-    const router = useRouter();
 
     useEffect(() => {
         setCards(loadFlashcards());
@@ -102,7 +103,7 @@ export default function Overview() {
             infoModalController.destroy();
             settingsModalController.destroy();
         };
-    }, [router]);
+    }, []);
 
     // ─────────────────────────────────────────────
     // Karte hinzufügen ODER bestehende Karte speichern
