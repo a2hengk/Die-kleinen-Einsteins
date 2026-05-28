@@ -3,6 +3,8 @@
 import stylesContainer from '../styles/selfstudy-styles/container.module.css';
 import StatusBar from '../../components/ui/statusbar/statusbar';
 import { Button } from '../../components/ui/button/button';
+import { loadFlashcards, type Flashcard } from '../../lib/flashcards';
+import { useRouter } from 'next/navigation';
 
 // import navbar
 import { useEffect, useRef, useState } from "react";
@@ -15,9 +17,36 @@ export default function SelfStudy() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState(1);
-  const totalQuestions = 10;
+  const [cards, setCards] = useState<Flashcard[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
   const navMountRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+  const totalQuestions = cards.length;
+  const hasCards = totalQuestions > 0;
+  const currentQuestion = hasCards ? currentIndex + 1 : 0;
+  const currentCard = hasCards ? cards[currentIndex] : null;
+
+  useEffect(() => {
+    const syncCards = () => {
+      setCards(loadFlashcards());
+    };
+
+    syncCards();
+    window.addEventListener("storage", syncCards);
+
+    return () => {
+      window.removeEventListener("storage", syncCards);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (currentIndex < cards.length) {
+      return;
+    }
+
+    setCurrentIndex(Math.max(0, cards.length - 1));
+  }, [cards.length, currentIndex]);
 
 
   // Navbar setup
@@ -37,7 +66,7 @@ export default function SelfStudy() {
       mount: navMountRef.current,
       onNavigate: (itemId) => {
         if (itemId === "karteikasten") {
-          window.location.href = "/";
+          router.push("/");
         }
 
         if (itemId === "selbstlernen") {
@@ -45,7 +74,7 @@ export default function SelfStudy() {
         }
 
         if (itemId === "abfragen") {
-          window.location.href = "/abfrage";
+          router.push("/abfrage");
         }
       },
       onOpenInfo: () => {
@@ -77,28 +106,93 @@ export default function SelfStudy() {
       infoModalController.destroy();
       settingsModalController.destroy();
     };
-  }, []);
+  }, [router]);
+
+  const handleAnswer = (isCorrect: boolean) => {
+    if (!hasCards || isComplete) {
+      return;
+    }
+
+    if (isCorrect) {
+      setCorrectCount((prev) => prev + 1);
+    } else {
+      setWrongCount((prev) => prev + 1);
+    }
+
+    if (currentIndex < totalQuestions - 1) {
+      setCurrentIndex((prev) => prev + 1);
+      setIsFlipped(false);
+      return;
+    }
+
+    setIsComplete(true);
+  };
+
+  const restartSession = () => {
+    setCorrectCount(0);
+    setWrongCount(0);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setIsComplete(false);
+  };
 
   // end Navbar setup
 
   return (
     <div className={stylesContainer.primary}>
       <StatusBar correctCount={correctCount} wrongCount={wrongCount} currentQuestion={currentQuestion} totalQuestions={totalQuestions} />
-      <div 
-        className={`${stylesContainer.card} ${isFlipped ? stylesContainer.flipover : ''}`}
-        onClick={() => setIsFlipped(!isFlipped)}
+      <div
+        className={`${stylesContainer.card} ${isFlipped ? stylesContainer.flipover : ''} ${!hasCards ? stylesContainer.cardEmpty : ''}`}
+        onClick={() => {
+          if (hasCards && !isComplete) {
+            setIsFlipped((prev) => !prev);
+          }
+        }}
       >
-        {isFlipped ? 'Flipped Content' : 'Original Content'}
+        {!hasCards && 'Noch keine Karten vorhanden. Erstelle zuerst Karten im Karteikasten.'}
+        {hasCards && !isComplete && (
+          <>
+            <div className={stylesContainer.cardSideLabel}>
+              {isFlipped ? 'Rückseite' : 'Vorderseite'}
+            </div>
+            <div className={stylesContainer.cardText}>
+              {isFlipped ? currentCard?.back : currentCard?.front}
+            </div>
+          </>
+        )}
+        {hasCards && isComplete && (
+          <div className={stylesContainer.cardText}>
+            Runde abgeschlossen. Richtig: {correctCount}, Falsch: {wrongCount}
+          </div>
+        )}
       </div>
       <div className={stylesContainer.buttons}>
-        <Button content="Correct" color="primary" onClick={() => {
-          setCorrectCount(correctCount + 1);
-          if (currentQuestion < totalQuestions) setCurrentQuestion(currentQuestion + 1);
-        }} />
-        <Button content="Wrong" color="secondary" onClick={() => {
-          setWrongCount(wrongCount + 1);
-          if (currentQuestion < totalQuestions) setCurrentQuestion(currentQuestion + 1);
-        }} />
+        <Button
+          content="Richtig"
+          color="primary"
+          onClick={() => handleAnswer(true)}
+          disabled={!hasCards || isComplete}
+        />
+        <Button
+          content="Falsch"
+          color="secondary"
+          onClick={() => handleAnswer(false)}
+          disabled={!hasCards || isComplete}
+        />
+        {(isComplete || !hasCards) && (
+          <Button
+            content={isComplete ? 'Neu starten' : 'Zum Karteikasten'}
+            color="primary"
+            onClick={() => {
+              if (isComplete) {
+                restartSession();
+                return;
+              }
+
+              router.push('/');
+            }}
+          />
+        )}
       </div>
       <div ref={navMountRef} />
     </div>

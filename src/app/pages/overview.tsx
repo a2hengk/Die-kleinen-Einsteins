@@ -2,37 +2,48 @@
 
 import styleContainer from "../styles/overview-styles/container.module.css";
 import styleButton from "../styles/overview-styles/button.module.css";
-import styleBody from "../styles/overview-styles/body.module.css";
-
-// import navbar
-import { useEffect, useRef, useState } from "react";
-import { mountFloatingNavBar } from "../../components/navbar-components/floatingNavBar";
-import { createInfoModal } from "../../components/navbar-components/infoModal";
-import { configureDialogTrigger } from "../../components/navbar-components/modalUtils";
-import { createSettingsModal } from "../../components/navbar-components/settingsModal";
-
-interface Card {
-    id: number;
-    front: string;
-    back: string;
-}
+import { loadFlashcards, saveFlashcards, type Flashcard } from "../../lib/flashcards";
+import { useState } from "react";
+import { useEffect } from "react";
 
 export default function Overview() {
-    const [cards, setCards] = useState<Card[]>([]);
+    const [cards, setCards] = useState<Flashcard[]>([]);
     const [clicked, setClicked] = useState<number[]>([]);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formData, setFormData] = useState<{ front: string; back: string }>({
         front: "",
         back: "",
     });
+    const [isHydrated, setIsHydrated] = useState(false);
+    const isFormValid = formData.front.trim().length > 0 && formData.back.trim().length > 0;
+
+    useEffect(() => {
+        setCards(loadFlashcards());
+        setIsHydrated(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isHydrated) {
+            return;
+        }
+
+        saveFlashcards(cards);
+    }, [cards, isHydrated]);
 
     const addCard = () => {
+        const trimmedFront = formData.front.trim();
+        const trimmedBack = formData.back.trim();
+
+        if (!trimmedFront || !trimmedBack) {
+            return;
+        }
+
         if (editingId !== null) {
             // Edit existierende Karte
             setCards((prev) =>
                 prev.map((card) =>
                     card.id === editingId
-                        ? { ...card, front: formData.front, back: formData.back }
+                        ? { ...card, front: trimmedFront, back: trimmedBack }
                         : card
                 )
             );
@@ -42,8 +53,8 @@ export default function Overview() {
                 ...prev,
                 {
                     id: Date.now(),
-                    front: formData.front,
-                    back: formData.back,
+                    front: trimmedFront,
+                    back: trimmedBack,
                 },
             ]);
         }
@@ -81,7 +92,9 @@ export default function Overview() {
             <h1 className={styleContainer.title}>Karteikartenuebersicht</h1>
             {/* Formular zum Hinzufügen/Bearbeiten */}
             <div className={styleContainer.formContainer}>
-                <h2>{editingId ? "Karte bearbeiten" : "Neue Karte hinzufügen"}</h2>
+                <h2 className={styleContainer.sectionTitle}>
+                    {editingId ? "Karte bearbeiten" : "Neue Karte hinzufügen"}
+                </h2>
                 <input
                     type="text"
                     placeholder="Vorderseite"
@@ -100,6 +113,7 @@ export default function Overview() {
                     <button
                         onClick={addCard}
                         className={styleButton.submitButton}
+                        disabled={!isFormValid}
                     >
                         {editingId ? "Speichern" : "Hinzufügen"}
                     </button>
@@ -119,9 +133,8 @@ export default function Overview() {
                 {cards.map((card) => (
                     <div key={card.id} className={styleContainer.cardItem}>
                         <div
-                            className={`${styleContainer.card} ${
-                                clicked.includes(card.id) ? "clicked" : ""
-                            }`}
+                            className={`${styleContainer.card} ${clicked.includes(card.id) ? styleContainer.clicked : ""
+                                }`}
                             onClick={() => toggleCard(card.id)}
                         >
                             <div className={styleContainer.cardContent}>
@@ -129,23 +142,22 @@ export default function Overview() {
                                     <p><strong>Vorderseite:</strong> {card.front}</p>
                                     <p><strong>Rückseite:</strong> {card.back}</p>
                                 </div>
-                                <button
-                                    className={styleButton.editButton}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        removeCard(card.id);
-                                    }}
-                                >
-                                    Löschen
-                                </button>
                             </div>
                         </div>
-                        <button
-                            className={styleButton.editButton}
-                            onClick={() => editCard(card.id)}
-                        >
-                            Bearbeiten
-                        </button>
+                        <div className={styleButton.cardActionRow}>
+                            <button
+                                className={styleButton.editButton}
+                                onClick={() => editCard(card.id)}
+                            >
+                                Bearbeiten
+                            </button>
+                            <button
+                                className={styleButton.deleteButton}
+                                onClick={() => removeCard(card.id)}
+                            >
+                                Löschen
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>

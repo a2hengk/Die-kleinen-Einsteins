@@ -6,6 +6,7 @@ type ButtonProps = {
   color?: "primary" | "secondary";
   border?: string;
   onClick?: () => void;
+  disabled?: boolean;
 };
 
 export const Button = ({
@@ -13,11 +14,15 @@ export const Button = ({
   color = "primary",
   onClick,
   border = "",
+  disabled = false,
 }: ButtonProps) => {
+  const borderClass = border ? styles[border] : "";
+
   return (
     <button
       onClick={onClick}
-      className={`${styles.body} ${styles[color]} ${styles[border]}`}
+      disabled={disabled}
+      className={`${styles.body} ${styles[color]} ${borderClass}`.trim()}
     >
       {content}
     </button>
