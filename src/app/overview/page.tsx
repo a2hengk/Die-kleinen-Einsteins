@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────
 // CSS-Module für Layout/Container und Buttons
 // ─────────────────────────────────────────────
-import styleContainer from "./styles/overview-styles/container.module.css";
+import styleContainer from "../styles/overview-styles/container.module.css";
 import { Button } from "@/components/ui/button/button";
 import Input from "@/components/ui/input/input";
 import { loadFlashcards, saveFlashcards } from "@/lib/flashcards";
