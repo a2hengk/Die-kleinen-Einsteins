@@ -223,15 +223,17 @@ export default function Overview() {
                                     color="secondary"
                                     onClick={() => removeCard(card.id)}
                                 />
+
+                                {/* Bearbeiten-Button füllt das Formular mit den Kartendaten */}
+                                <Button
+                                    content="Bearbeiten"
+                                    color="primary"
+                                    onClick={() => editCard(card.id)}
+                                />
                             </div>
                         </div>
 
-                        {/* Bearbeiten-Button füllt das Formular mit den Kartendaten */}
-                        <Button
-                            content="Bearbeiten"
-                            color="primary"
-                            onClick={() => editCard(card.id)}
-                        />
+
                     </div>
                 ))}
             </div>
