@@ -12,6 +12,7 @@ import { loadFlashcards, saveFlashcards } from "@/lib/flashcards";
 // Navbar-Komponenten und Hilfsfunktionen
 // ─────────────────────────────────────────────
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { mountFloatingNavBar } from "../../components/navbar-components/floatingNavBar";
 import { createInfoModal } from "../../components/navbar-components/infoModal";
 import { configureDialogTrigger } from "../../components/navbar-components/modalUtils";
@@ -43,6 +44,7 @@ export default function Overview() {
         back: "",
     });
     const [isHydrated, setIsHydrated] = useState(false);
+    const router = useRouter();
 
     // Ref für den DOM-Einhängepunkt der Navbar
     const navMountRef = useRef<HTMLDivElement | null>(null);
@@ -79,11 +81,11 @@ export default function Overview() {
                 if (itemId === "karteikasten") return; // Aktuelle Seite – kein Wechsel nötig
 
                 if (itemId === "selbstlernen") {
-                    window.location.href = "/selfstudy"; // Weiterleitung zum Selbstlern-Modus
+                    router.push("/selfstudy"); // Clientseitiger Wechsel ohne Reload
                 }
 
                 if (itemId === "abfragen") {
-                    window.location.href = "/abfrage"; // Weiterleitung zum Abfrage-Modus
+                    router.push("/abfrage"); // Clientseitiger Wechsel ohne Reload
                 }
             },
             onOpenInfo: () => infoModalController.open(),
@@ -194,8 +196,8 @@ export default function Overview() {
             </div>
 
             {clicked.length > 0 && (
-                <div 
-                    className={styleContainer.backdrop} 
+                <div
+                    className={styleContainer.backdrop}
                     onClick={() => setClicked([])}
                 />
             )}
