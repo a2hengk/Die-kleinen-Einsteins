@@ -13,10 +13,10 @@ import { loadFlashcards, saveFlashcards } from "@/lib/flashcards";
 // Navbar-Komponenten und Hilfsfunktionen
 // ─────────────────────────────────────────────
 import { useEffect, useRef, useState } from "react";
-import { mountFloatingNavBar } from "../components/navbar-components/floatingNavBar";
-import { createInfoModal } from "../components/navbar-components/infoModal";
-import { configureDialogTrigger } from "../components/navbar-components/modalUtils";
-import { createSettingsModal } from "../components/navbar-components/settingsModal";
+import { mountFloatingNavBar } from "../../components/navbar-components/floatingNavBar";
+import { createInfoModal } from "../../components/navbar-components/infoModal";
+import { configureDialogTrigger } from "../../components/navbar-components/modalUtils";
+import { createSettingsModal } from "../../components/navbar-components/settingsModal";
 
 // ─────────────────────────────────────────────
 // TypeScript-Interface: Struktur einer Karteikarte
