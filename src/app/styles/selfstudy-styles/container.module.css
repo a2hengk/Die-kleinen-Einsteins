@@ -80,6 +80,10 @@
     transform: perspective(1000px) rotateY(180deg);
 }
 
+.flipover .cardSideLabel,
+.flipover .cardText {
+    transform: rotateY(180deg);
+}
 
 .right {
     flex: 1;
