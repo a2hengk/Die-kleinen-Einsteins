@@ -5,6 +5,7 @@ import StatusBar from '../../components/ui/statusbar/statusbar';
 import { Button } from '../../components/ui/button/button';
 import { loadFlashcards, type Flashcard } from '../../lib/flashcards';
 import { useRouter } from 'next/navigation';
+import { Result } from '@/components/abfrage/result';
 
 // import navbar
 import { useEffect, useRef, useState } from "react";
@@ -140,46 +141,59 @@ export default function SelfStudy() {
 
     return (
         <div className={stylesContainer.primary}>
-            <StatusBar correctCount={correctCount} wrongCount={wrongCount} currentQuestion={currentQuestion} totalQuestions={totalQuestions} />
-            <div
-                className={`${stylesContainer.card} ${isFlipped ? stylesContainer.flipover : ''} ${!hasCards ? stylesContainer.cardEmpty : ''}`}
-                onClick={() => {
-                    if (hasCards && !isComplete) {
-                        setIsFlipped((prev) => !prev);
-                    }
-                }}
-            >
-                {!hasCards && 'Noch keine Karten vorhanden. Erstelle zuerst Karten im Karteikasten.'}
-                {hasCards && !isComplete && (
-                    <>
-                        <div className={stylesContainer.cardSideLabel}>
-                            {isFlipped ? 'Rückseite' : 'Vorderseite'}
-                        </div>
-                        <div className={stylesContainer.cardText}>
-                            {isFlipped ? currentCard?.back : currentCard?.front}
-                        </div>
-                    </>
-                )}
-                {hasCards && isComplete && (
-                    <div className={stylesContainer.cardText}>
-                        Runde abgeschlossen. Richtig: {correctCount}, Falsch: {wrongCount}
+            <StatusBar
+                correctCount={correctCount}
+                wrongCount={wrongCount}
+                currentQuestion={currentQuestion}
+                totalQuestions={totalQuestions}
+            />
+
+            {isComplete ? (
+                <div className={stylesContainer.resultWrapper}>
+                    <Result data={{ score: correctCount, fail: wrongCount }} />
+                </div>
+            ) : (
+                <>
+                    <div
+                        className={`${stylesContainer.card} ${isFlipped ? stylesContainer.flipover : ''} ${!hasCards ? stylesContainer.cardEmpty : ''}`}
+                        onClick={() => {
+                            if (hasCards) {
+                                setIsFlipped((prev) => !prev);
+                            }
+                        }}
+                    >
+                        {!hasCards && 'Noch keine Karten vorhanden. Erstelle zuerst Karten im Karteikasten.'}
+                        {hasCards && (
+                            <>
+                                <div className={stylesContainer.cardSideLabel}>
+                                    {isFlipped ? 'Rückseite' : 'Vorderseite'}
+                                </div>
+                                <div className={stylesContainer.cardText}>
+                                    {isFlipped ? currentCard?.back : currentCard?.front}
+                                </div>
+                            </>
+                        )}
                     </div>
-                )}
-            </div>
-            <div className={stylesContainer.buttons}>
-                <Button
-                    content="Richtig"
-                    color="primary"
-                    onClick={() => handleAnswer(true)}
-                    disabled={!hasCards || isComplete}
-                />
-                <Button
-                    content="Falsch"
-                    color="secondary"
-                    onClick={() => handleAnswer(false)}
-                    disabled={!hasCards || isComplete}
-                />
-                {(isComplete || !hasCards) && (
+
+                    <div className={stylesContainer.buttons}>
+                        <Button
+                            content="Richtig"
+                            color="primary"
+                            onClick={() => handleAnswer(true)}
+                            disabled={!hasCards}
+                        />
+                        <Button
+                            content="Falsch"
+                            color="secondary"
+                            onClick={() => handleAnswer(false)}
+                            disabled={!hasCards}
+                        />
+                    </div>
+                </>
+            )}
+
+            {(isComplete || !hasCards) && (
+                <div className={stylesContainer.buttons}>
                     <Button
                         content={isComplete ? 'Neu starten' : 'Zum Karteikasten'}
                         color="primary"
@@ -192,8 +206,8 @@ export default function SelfStudy() {
                             router.push('/');
                         }}
                     />
-                )}
-            </div>
+                </div>
+            )}
             <div ref={navMountRef} />
         </div>
     );

@@ -3,7 +3,7 @@ import styles from "./result.module.css";
 import { QuizState } from "@/lib/types";
 
 interface PageProps {
-  data: QuizState;
+  data: Pick<QuizState, "score" | "fail">;
 }
 
 export const Result = ({ data }: PageProps) => {
