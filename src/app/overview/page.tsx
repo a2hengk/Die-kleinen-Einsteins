@@ -1,7 +1,7 @@
 "use client";
 
 // ─────────────────────────────────────────────
-// CSS-Module für Layout/Container und Buttons
+// CSS-Module für Layout/Container
 // ─────────────────────────────────────────────
 import styleContainer from "../styles/overview-styles/container.module.css";
 import { Button } from "@/components/ui/button/button";
@@ -20,7 +20,6 @@ import { createSettingsModal } from "../../components/navbar-components/settings
 
 // ─────────────────────────────────────────────
 // TypeScript-Interface: Struktur einer Karteikarte
-// Jede Karte hat eine eindeutige ID, Vorder- und Rückseite
 // ─────────────────────────────────────────────
 interface Card {
     id: number;
@@ -29,24 +28,21 @@ interface Card {
 }
 
 export default function Overview() {
-    // Liste aller gespeicherten Karteikarten
     const [cards, setCards] = useState<Card[]>([]);
-
-    // IDs der Karten, die gerade "umgedreht" (angeklickt) sind
-    const [clicked, setClicked] = useState<number[]>([]);
-
-    // ID der Karte, die gerade bearbeitet wird (null = keine Bearbeitung aktiv)
     const [editingId, setEditingId] = useState<number | null>(null);
-
-    // Formulardaten für Vorder- und Rückseite (sowohl beim Erstellen als auch beim Bearbeiten)
     const [formData, setFormData] = useState<{ front: string; back: string }>({
         front: "",
         back: "",
     });
     const [isHydrated, setIsHydrated] = useState(false);
-    const router = useRouter();
 
-    // Ref für den DOM-Einhängepunkt der Navbar
+    // Steuert das Formular-Modal (Erstellen / Bearbeiten)
+    const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+
+    // Die Karte, die im Detail-Modal angezeigt wird (null = geschlossen)
+    const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+
+    const router = useRouter();
     const navMountRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -55,10 +51,7 @@ export default function Overview() {
     }, []);
 
     useEffect(() => {
-        if (!isHydrated) {
-            return;
-        }
-
+        if (!isHydrated) return;
         saveFlashcards(cards);
     }, [cards, isHydrated]);
 
@@ -66,39 +59,27 @@ export default function Overview() {
     // Navbar initialisieren (läuft einmalig beim ersten Rendern)
     // ─────────────────────────────────────────────
     useEffect(() => {
-        if (!navMountRef.current) {
-            return;
-        }
+        if (!navMountRef.current) return;
 
-        // Info- und Einstellungsmodal erstellen und an <body> hängen
         const infoModalController = createInfoModal({ mount: document.body });
         const settingsModalController = createSettingsModal({ mount: document.body });
 
-        // Floating-Navbar einbinden mit Navigation und Modal-Callbacks
         const navController = mountFloatingNavBar({
             mount: navMountRef.current,
             onNavigate: (itemId) => {
-                if (itemId === "karteikasten") return; // Aktuelle Seite – kein Wechsel nötig
-
-                if (itemId === "selbstlernen") {
-                    router.push("/selfstudy"); // Clientseitiger Wechsel ohne Reload
-                }
-
-                if (itemId === "abfragen") {
-                    router.push("/abfrage"); // Clientseitiger Wechsel ohne Reload
-                }
+                if (itemId === "karteikasten") return;
+                if (itemId === "selbstlernen") router.push("/selfstudy");
+                if (itemId === "abfragen") router.push("/abfrage");
             },
             onOpenInfo: () => infoModalController.open(),
             onOpenSettings: () => settingsModalController.open(),
         });
 
-        // Dialog-Trigger für Info- und Einstellungsbutton konfigurieren
         const infoButton = navController.getInfoButton();
         const settingsButton = navController.getSettingsButton();
         configureDialogTrigger(infoButton, "vocab-info-dialog");
         configureDialogTrigger(settingsButton, "vocab-settings-dialog");
 
-        // Aufräumen beim Unmount der Komponente (verhindert Memory Leaks)
         return () => {
             navController.destroy();
             infoModalController.destroy();
@@ -109,16 +90,13 @@ export default function Overview() {
     // ─────────────────────────────────────────────
     // Karte hinzufügen ODER bestehende Karte speichern
     // ─────────────────────────────────────────────
-    const addCard = () => {
+    const saveCard = () => {
         const trimmedFront = formData.front.trim();
         const trimmedBack = formData.back.trim();
 
-        if (!trimmedFront || !trimmedBack) {
-            return;
-        }
+        if (!trimmedFront || !trimmedBack) return;
 
         if (editingId !== null) {
-            // Bearbeitungsmodus: Karte mit passender ID aktualisieren
             setCards((prev) =>
                 prev.map((card) =>
                     card.id === editingId
@@ -127,117 +105,176 @@ export default function Overview() {
                 )
             );
         } else {
-            // Neue Karte mit aktuellem Timestamp als eindeutiger ID anlegen
             setCards((prev) => [
                 ...prev,
-                {
-                    id: Date.now(),
-                    front: trimmedFront,
-                    back: trimmedBack,
-                },
+                { id: Date.now(), front: trimmedFront, back: trimmedBack },
             ]);
         }
 
-        // Formular zurücksetzen und Bearbeitungsmodus beenden
-        setFormData({ front: "", back: "" });
-        setEditingId(null);
+        closeFormModal();
     };
 
     // Karte anhand ihrer ID aus der Liste entfernen
     const removeCard = (id: number) => {
         setCards((prev) => prev.filter((card) => card.id !== id));
+        setSelectedCard(null);
     };
 
-    // Karte ein-/ausklappen (Toggle): ID wird zur clicked-Liste hinzugefügt oder entfernt
-    const toggleCard = (id: number) => {
-        setClicked((prev) =>
-            prev.includes(id)
-                ? prev.filter((cardId) => cardId !== id)
-                : [...prev, id]
-        );
+    // Karte zum Bearbeiten öffnen (aus dem Detail-Modal heraus)
+    const startEditCard = (card: Card) => {
+        setFormData({ front: card.front, back: card.back });
+        setEditingId(card.id);
+        setSelectedCard(null);
+        setIsFormModalOpen(true);
     };
 
-    // Karte zum Bearbeiten vorbereiten: Formulardaten befüllen und Bearbeitungsmodus aktivieren
-    const editCard = (id: number) => {
-        const card = cards.find((c) => c.id === id);
-        if (card) {
-            setFormData({ front: card.front, back: card.back });
-            setEditingId(id);
-        }
-    };
-
-    // Bearbeitung abbrechen: Formular leeren und Bearbeitungsmodus beenden
-    const cancelEdit = () => {
+    // „+" geklickt → leeres Formular-Modal öffnen
+    const openAddModal = () => {
         setFormData({ front: "", back: "" });
         setEditingId(null);
+        setIsFormModalOpen(true);
+    };
+
+    // Formular-Modal schließen und State zurücksetzen
+    const closeFormModal = () => {
+        setFormData({ front: "", back: "" });
+        setEditingId(null);
+        setIsFormModalOpen(false);
     };
 
     // ─────────────────────────────────────────────
-    // Render: Übersichtsseite mit Formular und Kartenliste
+    // Render
     // ─────────────────────────────────────────────
     return (
         <div className={styleContainer.header}>
-            <h1 className={styleContainer.title}>Karteikartenuebersicht</h1>
-            {/* Formular zum Hinzufügen/Bearbeiten */}
-            <div className={styleContainer.formContainer}>
-                <h2>{editingId ? "Karte bearbeiten" : "Neue Karte hinzufügen"}</h2>
-                <Input
-                    value={formData.front}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, front: e.target.value }))}
-                />
-                <Input
-                    value={formData.back}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, back: e.target.value }))}
-                />
-                <Button content={editingId ? "Speichern" : "Hinzufügen"} onClick={addCard} />
-                {editingId && (
-                    <Button content="Abbrechen" onClick={cancelEdit} color="secondary" />
-                )}
-            </div>
+            <h1 className={styleContainer.title}>Karteikartenübersicht</h1>
 
-            {clicked.length > 0 && (
-                <div
-                    className={styleContainer.backdrop}
-                    onClick={() => setClicked([])}
-                />
-            )}
-
-            {/* Liste aller Karteikarten */}
+            {/* Kartenraster */}
             <div className={styleContainer.cardContainer}>
+
+                {/* Vorhandene Karten */}
                 {cards.map((card) => (
                     <div key={card.id} className={styleContainer.cardItem}>
-
-                        {/* Karte: Klick dreht sie um (Toggle) */}
                         <div
-                            className={`${styleContainer.card} ${clicked.includes(card.id) ? styleContainer.clicked : ""
-                                }`}
-                            onClick={() => toggleCard(card.id)}
+                            className={styleContainer.card}
+                            onClick={() => setSelectedCard(card)}
                         >
                             <div className={styleContainer.cardContent}>
                                 <div>
-                                    <p><strong>Vorderseite:</strong> {card.front}</p>
-                                    <p><strong>Rückseite:</strong> {card.back}</p>
+                                    <span className={styleContainer.fieldLabel}>Vorderseite</span>
+                                    <p className={styleContainer.fieldValue}>{card.front}</p>
                                 </div>
-                                {/* Löschen-Button entfernt die Karte aus dem State */}
-                                <Button
-                                    content="Löschen"
-                                    color="secondary"
-                                    onClick={() => removeCard(card.id)}
-                                />
-
-                                {/* Bearbeiten-Button füllt das Formular mit den Kartendaten */}
-                                <Button
-                                    content="Bearbeiten"
-                                    color="primary"
-                                    onClick={() => editCard(card.id)}
-                                />
+                                <div>
+                                    <span className={styleContainer.fieldLabel}>Rückseite</span>
+                                    <p className={styleContainer.fieldValue}>{card.back}</p>
+                                </div>
                             </div>
                         </div>
-
-
                     </div>
                 ))}
+
+                {/* „+" Kachel zum Hinzufügen */}
+                <div className={styleContainer.cardItem}>
+                    <div
+                        className={styleContainer.addPlaceholder}
+                        onClick={openAddModal}
+                    >
+                        <div className={styleContainer.addIcon}>+</div>
+                        <span>Neue Karte</span>
+                    </div>
+                </div>
+
             </div>
+
+            {/* ── Formular-Modal (Hinzufügen / Bearbeiten) ── */}
+            {isFormModalOpen && (
+                <div className={styleContainer.overlay} onClick={closeFormModal}>
+                    <div
+                        className={styleContainer.modal}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h2 className={styleContainer.modalHeader}>
+                            {editingId ? "Karte bearbeiten" : "Neue Karte erstellen"}
+                        </h2>
+                        <hr className={styleContainer.divider} />
+
+                        <div>
+                            <span className={styleContainer.fieldLabel}>Vorderseite</span>
+                            <Input
+                                value={formData.front}
+                                onChange={(e) =>
+                                    setFormData((prev) => ({ ...prev, front: e.target.value }))
+                                }
+                            />
+                        </div>
+
+                        <div>
+                            <span className={styleContainer.fieldLabel}>Rückseite</span>
+                            <Input
+                                value={formData.back}
+                                onChange={(e) =>
+                                    setFormData((prev) => ({ ...prev, back: e.target.value }))
+                                }
+                            />
+                        </div>
+
+                        <hr className={styleContainer.divider} />
+
+                        <div className={styleContainer.buttonRow}>
+                            <Button
+                                content={editingId ? "Speichern" : "Hinzufügen"}
+                                onClick={saveCard}
+                            />
+                            <Button
+                                content="Abbrechen"
+                                color="secondary"
+                                onClick={closeFormModal}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Detail-Modal (Klick auf bestehende Karte) ── */}
+            {selectedCard && (
+                <div
+                    className={styleContainer.overlay}
+                    onClick={() => setSelectedCard(null)}
+                >
+                    <div
+                        className={styleContainer.detailModal}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h2 className={styleContainer.modalHeader}>Karteikarte</h2>
+                        <hr className={styleContainer.divider} />
+
+                        <div>
+                            <span className={styleContainer.fieldLabel}>Vorderseite</span>
+                            <p className={styleContainer.fieldValue}>{selectedCard.front}</p>
+                        </div>
+
+                        <div>
+                            <span className={styleContainer.fieldLabel}>Rückseite</span>
+                            <p className={styleContainer.fieldValue}>{selectedCard.back}</p>
+                        </div>
+
+                        <hr className={styleContainer.divider} />
+
+                        <div className={styleContainer.buttonRow}>
+                            <Button
+                                content="Bearbeiten"
+                                color="primary"
+                                onClick={() => startEditCard(selectedCard)}
+                            />
+                            <Button
+                                content="Löschen"
+                                color="secondary"
+                                onClick={() => removeCard(selectedCard.id)}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Einhängepunkt für die floating Navbar */}
             <div ref={navMountRef} />
