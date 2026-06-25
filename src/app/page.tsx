@@ -78,15 +78,9 @@ export default function Overview() {
         const navController = mountFloatingNavBar({
             mount: navMountRef.current,
             onNavigate: (itemId) => {
-                if (itemId === "karteikasten") return; // Aktuelle Seite – kein Wechsel nötig
-
-                if (itemId === "selbstlernen") {
-                    router.push("/selfstudy"); // Clientseitiger Wechsel ohne Reload
-                }
-
-                if (itemId === "abfragen") {
-                    router.push("/abfrage"); // Clientseitiger Wechsel ohne Reload
-                }
+                if (itemId === "karteikasten") router.push("/overview");
+                if (itemId === "selbstlernen") router.push("/selfstudy");
+                if (itemId === "abfragen") router.push("/abfrage");
             },
             onOpenInfo: () => infoModalController.open(),
             onOpenSettings: () => settingsModalController.open(),

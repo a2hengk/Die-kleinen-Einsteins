@@ -66,17 +66,9 @@ export default function SelfStudy() {
         const navController = mountFloatingNavBar({
             mount: navMountRef.current,
             onNavigate: (itemId) => {
-                if (itemId === "karteikasten") {
-                    router.push("/");
-                }
-
-                if (itemId === "selbstlernen") {
-                    return;
-                }
-
-                if (itemId === "abfragen") {
-                    router.push("/abfrage");
-                }
+                if (itemId === "karteikasten") router.push("/overview");
+                if (itemId === "selbstlernen") return;
+                if (itemId === "abfragen") router.push("/abfrage");
             },
             onOpenInfo: () => {
                 infoModalController.open();
