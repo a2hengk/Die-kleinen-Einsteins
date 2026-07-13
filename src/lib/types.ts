@@ -1,3 +1,16 @@
+export type Flashcard = {
+  id: number;
+  front: string;
+  back: string;
+};
+
+export type CardProgress = {
+  cardId: number;
+  correctCount: number;
+  wrongCount: number;
+  lastReviewedAt: string | null;
+};
+
 export type Image = {
   url: string;
   altText: string;

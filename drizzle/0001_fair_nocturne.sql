@@ -1,0 +1,1 @@
+ALTER TABLE "card_progress" ADD CONSTRAINT "card_progress_user_id_card_id_unique" UNIQUE("user_id","card_id");

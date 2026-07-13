@@ -6,7 +6,8 @@
 import styleContainer from "../styles/overview-styles/container.module.css";
 import { Button } from "@/components/ui/button/button";
 import Input from "@/components/ui/input/input";
-import { loadFlashcards, saveFlashcards } from "@/lib/flashcards";
+import { createCard, deleteCard, fetchCards, updateCard } from "@/lib/api/cards";
+import type { Flashcard } from "@/lib/types";
 
 // ─────────────────────────────────────────────
 // Navbar-Komponenten und Hilfsfunktionen
@@ -18,14 +19,7 @@ import { createInfoModal } from "../../components/navbar-components/infoModal";
 import { configureDialogTrigger } from "../../components/navbar-components/modalUtils";
 import { createSettingsModal } from "../../components/navbar-components/settingsModal";
 
-// ─────────────────────────────────────────────
-// TypeScript-Interface: Struktur einer Karteikarte
-// ─────────────────────────────────────────────
-interface Card {
-    id: number;
-    front: string;
-    back: string;
-}
+type Card = Flashcard;
 
 export default function Overview() {
     const [cards, setCards] = useState<Card[]>([]);
@@ -34,7 +28,6 @@ export default function Overview() {
         front: "",
         back: "",
     });
-    const [isHydrated, setIsHydrated] = useState(false);
 
     // Steuert das Formular-Modal (Erstellen / Bearbeiten)
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -46,14 +39,8 @@ export default function Overview() {
     const navMountRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        setCards(loadFlashcards());
-        setIsHydrated(true);
+        fetchCards().then(setCards).catch(() => setCards([]));
     }, []);
-
-    useEffect(() => {
-        if (!isHydrated) return;
-        saveFlashcards(cards);
-    }, [cards, isHydrated]);
 
     // ─────────────────────────────────────────────
     // Navbar initialisieren (läuft einmalig beim ersten Rendern)
@@ -90,32 +77,31 @@ export default function Overview() {
     // ─────────────────────────────────────────────
     // Karte hinzufügen ODER bestehende Karte speichern
     // ─────────────────────────────────────────────
-    const saveCard = () => {
+    const saveCard = async () => {
         const trimmedFront = formData.front.trim();
         const trimmedBack = formData.back.trim();
 
         if (!trimmedFront || !trimmedBack) return;
 
         if (editingId !== null) {
+            const updated = await updateCard(editingId, {
+                front: trimmedFront,
+                back: trimmedBack,
+            });
             setCards((prev) =>
-                prev.map((card) =>
-                    card.id === editingId
-                        ? { ...card, front: trimmedFront, back: trimmedBack }
-                        : card
-                )
+                prev.map((card) => (card.id === editingId ? updated : card))
             );
         } else {
-            setCards((prev) => [
-                ...prev,
-                { id: Date.now(), front: trimmedFront, back: trimmedBack },
-            ]);
+            const created = await createCard(trimmedFront, trimmedBack);
+            setCards((prev) => [...prev, created]);
         }
 
         closeFormModal();
     };
 
     // Karte anhand ihrer ID aus der Liste entfernen
-    const removeCard = (id: number) => {
+    const removeCard = async (id: number) => {
+        await deleteCard(id);
         setCards((prev) => prev.filter((card) => card.id !== id));
         setSelectedCard(null);
     };

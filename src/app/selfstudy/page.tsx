@@ -3,7 +3,9 @@
 import stylesContainer from '../styles/selfstudy-styles/container.module.css';
 import StatusBar from '../../components/ui/statusbar/statusbar';
 import { Button } from '../../components/ui/button/button';
-import { loadFlashcards, type Flashcard } from '../../lib/flashcards';
+import { fetchCards } from '@/lib/api/cards';
+import { recordAnswer } from '@/lib/api/progress';
+import type { Flashcard } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { Result } from '@/components/abfrage/result';
 
@@ -29,16 +31,7 @@ export default function SelfStudy() {
     const currentCard = hasCards ? cards[currentIndex] : null;
 
     useEffect(() => {
-        const syncCards = () => {
-            setCards(loadFlashcards());
-        };
-
-        syncCards();
-        window.addEventListener("storage", syncCards);
-
-        return () => {
-            window.removeEventListener("storage", syncCards);
-        };
+        fetchCards().then(setCards).catch(() => setCards([]));
     }, []);
 
     useEffect(() => {
@@ -102,9 +95,11 @@ export default function SelfStudy() {
     }, [router]);
 
     const handleAnswer = (isCorrect: boolean) => {
-        if (!hasCards || isComplete) {
+        if (!hasCards || isComplete || !currentCard) {
             return;
         }
+
+        recordAnswer(currentCard.id, isCorrect).catch(() => {});
 
         if (isCorrect) {
             setCorrectCount((prev) => prev + 1);
