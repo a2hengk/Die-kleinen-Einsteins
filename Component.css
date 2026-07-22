@@ -122,7 +122,7 @@ button {
   left: 50%;
   transform: translateX(-50%);
   bottom: 16px;
-  width: min(96vw, 860px);
+  width: min(96vw, 980px);
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -170,6 +170,16 @@ button {
 .vocab-nav__button--icon {
   display: grid;
   place-items: center;
+}
+
+.vocab-nav__button--auth {
+  border-color: color-mix(in srgb, var(--primary) 34%, var(--border));
+  color: var(--primary-strong);
+}
+
+.vocab-nav__button--auth.is-logout {
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 38%, var(--border));
 }
 
 .vocab-nav__icon {
@@ -320,6 +330,16 @@ button {
   font-size: 0.88rem;
 }
 
+.vocab-settings__status {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--panel) 90%, var(--bg-accent) 10%);
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.65rem 0.75rem;
+}
+
 .vocab-settings__error {
   color: var(--danger);
   font-size: 0.85rem;
@@ -376,6 +396,8 @@ button {
 
 .vocab-settings__actions {
   display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
   justify-content: flex-end;
 }
 
@@ -414,16 +436,30 @@ button {
   font-size: 0.9rem;
 }
 
+.vocab-settings__toast--error {
+  color: var(--danger);
+}
+
 @media (max-width: 640px) {
   .vocab-nav {
     width: calc(100vw - 1rem);
     bottom: 8px;
+    border-radius: 24px;
+  }
+
+  .vocab-nav__list {
+    flex-wrap: wrap;
+  }
+
+  .vocab-nav__item {
+    flex: 1 1 30%;
   }
 
   .vocab-nav__button {
     min-height: 2.8rem;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     padding: 0.65rem 0.6rem;
+    white-space: normal;
   }
 
   .vocab-settings__dialog {

@@ -27,9 +27,27 @@ type ToggleField = {
   input: HTMLInputElement;
 };
 
+type AuthSession = {
+  username: string;
+  email: string;
+  userId?: string;
+  loggedIn: boolean;
+  createdAt?: string;
+};
+
+type StoredSettings = {
+  account?: Partial<AppSettings["account"]>;
+  ui?: Partial<AppSettings["ui"]>;
+  trainer?: Partial<AppSettings["trainer"]>;
+  accessibility?: Partial<AppSettings["accessibility"]>;
+};
+
 const THEME_QUERY = "(prefers-color-scheme: dark)";
 const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const AUTH_STORAGE_KEY = "vocab-auth-session";
+const SETTINGS_STORAGE_KEY = "vocab-app-settings";
+const AUTH_EVENT_NAME = "vocab-auth-change";
 
 const clone = (settings: AppSettings): AppSettings => ({
   account: { ...settings.account },
@@ -43,6 +61,15 @@ const preferredTheme = (): "light" | "dark" =>
 
 const preferredReducedMotion = (): boolean =>
   window.matchMedia(MOTION_QUERY).matches;
+
+const createUserId = (email: string): string => {
+  const emailName = email
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return `user-${emailName || "guest"}`;
+};
 
 const applyPreferences = (settings: AppSettings): void => {
   const root = document.documentElement;
@@ -58,11 +85,82 @@ const applyPreferences = (settings: AppSettings): void => {
   );
 };
 
+const readAuthSession = (): AuthSession | null => {
+  const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
+  if (!raw) return null;
+
+  try {
+    const session = JSON.parse(raw) as AuthSession;
+    return session.loggedIn ? session : null;
+  } catch {
+    return null;
+  }
+};
+
+const readStoredSettings = (): StoredSettings => {
+  const raw = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
+  if (!raw) return {};
+
+  try {
+    return JSON.parse(raw) as StoredSettings;
+  } catch {
+    return {};
+  }
+};
+
 const read = (): AppSettings => {
   const base = clone(DEMO_DEFAULT_SETTINGS);
+  const stored = readStoredSettings();
+  const session = readAuthSession();
+
   base.ui.theme = preferredTheme();
   base.accessibility.reducedMotion = preferredReducedMotion();
+
+  if (stored.account?.username) base.account.username = stored.account.username;
+  if (stored.account?.email) base.account.email = stored.account.email;
+  if (stored.ui?.theme === "dark" || stored.ui?.theme === "light") {
+    base.ui.theme = stored.ui.theme;
+  }
+  if (typeof stored.trainer?.audioOnCorrect === "boolean") {
+    base.trainer.audioOnCorrect = stored.trainer.audioOnCorrect;
+  }
+  if (typeof stored.trainer?.autoFocusInput === "boolean") {
+    base.trainer.autoFocusInput = stored.trainer.autoFocusInput;
+  }
+  if (typeof stored.accessibility?.largeText === "boolean") {
+    base.accessibility.largeText = stored.accessibility.largeText;
+  }
+  if (typeof stored.accessibility?.reducedMotion === "boolean") {
+    base.accessibility.reducedMotion = stored.accessibility.reducedMotion;
+  }
+  if (typeof stored.accessibility?.highContrast === "boolean") {
+    base.accessibility.highContrast = stored.accessibility.highContrast;
+  }
+
+  if (session) {
+    base.account.username = session.username;
+    base.account.email = session.email;
+  }
+
   return base;
+};
+
+const saveSettings = (settings: AppSettings): void => {
+  window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+
+  const session = readAuthSession();
+  if (session) {
+    const nextSession: AuthSession = {
+      ...session,
+      username: settings.account.username,
+      email: settings.account.email,
+      userId: createUserId(settings.account.email)
+    };
+
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(nextSession));
+  }
+
+  window.dispatchEvent(new CustomEvent(AUTH_EVENT_NAME, { detail: settings }));
 };
 
 const formatElapsed = (startedAt: number): string => {
@@ -265,14 +363,14 @@ export const createSettingsModal = (
   const currentPw = passwordInput(
     "vocab-settings-current-password",
     "Aktuelles Passwort",
-    "Nur Demo: Keine echte Serverprüfung."
+    "Wird nur für die Änderung abgefragt."
   );
   currentPw.input.autocomplete = "current-password";
 
   const newPw = passwordInput(
     "vocab-settings-new-password",
     "Neues Passwort",
-    "Mindestens 8 Zeichen."
+    "Mindestens 8 Zeichen. Wird nicht im Browser gespeichert."
   );
   newPw.input.autocomplete = "new-password";
 
@@ -325,8 +423,12 @@ export const createSettingsModal = (
     state.accessibility.highContrast
   );
 
+  const authStatus = document.createElement("p");
+  authStatus.className = "vocab-settings__status";
+
   const accountSection = createSection("Account und Profil");
   accountSection.append(
+    authStatus,
     username.wrap,
     email.wrap,
     currentPw.wrap,
@@ -350,11 +452,16 @@ export const createSettingsModal = (
   const actions = document.createElement("div");
   actions.className = "vocab-settings__actions";
 
+  const logout = document.createElement("button");
+  logout.className = "vocab-settings__secondary-button";
+  logout.type = "button";
+  logout.textContent = "Abmelden";
+
   const save = document.createElement("button");
   save.className = "vocab-settings__save";
   save.type = "submit";
   save.textContent = "Speichern";
-  actions.append(save);
+  actions.append(logout, save);
 
   form.append(
     accountSection,
@@ -374,6 +481,13 @@ export const createSettingsModal = (
     highContrast.input
   ] as const;
 
+  const replaceState = (next: AppSettings): void => {
+    state.account = { ...next.account };
+    state.ui = { ...next.ui };
+    state.trainer = { ...next.trainer };
+    state.accessibility = { ...next.accessibility };
+  };
+
   const notify = (): void => {
     listeners.forEach((listener) => listener(clone(state)));
   };
@@ -382,6 +496,7 @@ export const createSettingsModal = (
     [username, email, ...passwordFields].forEach(clearFieldError);
     toast.hidden = true;
     toast.textContent = "";
+    toast.classList.remove("vocab-settings__toast--error");
   };
 
   const clearPasswordInputs = (): void => {
@@ -391,6 +506,8 @@ export const createSettingsModal = (
   };
 
   const syncFormWithState = (): void => {
+    const session = readAuthSession();
+
     username.input.value = state.account.username;
     email.input.value = state.account.email;
     darkMode.input.checked = state.ui.theme === "dark";
@@ -399,6 +516,10 @@ export const createSettingsModal = (
     largeText.input.checked = state.accessibility.largeText;
     reducedMotion.input.checked = state.accessibility.reducedMotion;
     highContrast.input.checked = state.accessibility.highContrast;
+    authStatus.textContent = session
+      ? `Angemeldet als ${session.username}`
+      : "Nicht angemeldet.";
+    logout.hidden = session === null;
     clearPasswordInputs();
   };
 
@@ -422,14 +543,15 @@ export const createSettingsModal = (
     });
   };
 
-  const resetDemoState = (): void => {
+  const resetFormState = (): void => {
     clearErrors();
     syncFormWithState();
     applyPreferences(state);
   };
 
   const open = (): void => {
-    resetDemoState();
+    replaceState(read());
+    resetFormState();
     updateTimer();
     modal.open();
   };
@@ -439,6 +561,15 @@ export const createSettingsModal = (
 
   previewInputs.forEach((input) => {
     input.addEventListener("change", applyPreviewState);
+  });
+
+  logout.addEventListener("click", () => {
+    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    window.dispatchEvent(new CustomEvent(AUTH_EVENT_NAME));
+    replaceState(read());
+    resetFormState();
+    modal.close();
+    window.location.assign("/anmeldung");
   });
 
   form.addEventListener("submit", (event) => {
@@ -458,6 +589,10 @@ export const createSettingsModal = (
       valid = false;
       setFieldError(email, "Bitte gib eine gültige E-Mail-Adresse ein.");
     }
+    if (hasPasswordInput && !currentPw.input.value) {
+      valid = false;
+      setFieldError(currentPw, "Bitte gib dein aktuelles Passwort ein.");
+    }
     if (hasPasswordInput && newPw.input.value.length < 8) {
       valid = false;
       setFieldError(newPw, "Neues Passwort muss mindestens 8 Zeichen lang sein.");
@@ -472,9 +607,40 @@ export const createSettingsModal = (
       return;
     }
 
-    toast.hidden = false;
-    toast.textContent = "Demo-Modus: Es wird nichts gespeichert.";
-    notify();
+    replaceState({
+      account: {
+        username: usernameValue,
+        email: emailValue
+      },
+      ui: {
+        theme: darkMode.input.checked ? "dark" : "light"
+      },
+      trainer: {
+        audioOnCorrect: audio.input.checked,
+        autoFocusInput: autoFocus.input.checked
+      },
+      accessibility: {
+        largeText: largeText.input.checked,
+        reducedMotion: reducedMotion.input.checked,
+        highContrast: highContrast.input.checked
+      }
+    });
+
+    save.disabled = true;
+    try {
+      saveSettings(state);
+      applyPreferences(state);
+      syncFormWithState();
+      toast.hidden = false;
+      toast.textContent = "Einstellungen gespeichert.";
+      notify();
+    } catch {
+      toast.hidden = false;
+      toast.textContent = "Einstellungen konnten nicht gespeichert werden.";
+      toast.classList.add("vocab-settings__toast--error");
+    } finally {
+      save.disabled = false;
+    }
   });
 
   const themeMedia = window.matchMedia(THEME_QUERY);
@@ -494,7 +660,7 @@ export const createSettingsModal = (
   return {
     open,
     close: () => {
-      resetDemoState();
+      resetFormState();
       modal.close();
     },
     getSettings: () => clone(state),

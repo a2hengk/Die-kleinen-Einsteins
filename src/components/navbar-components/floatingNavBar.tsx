@@ -11,12 +11,42 @@ export interface FloatingNavBarController {
   getSettingsButton: () => HTMLButtonElement;
 }
 
+type AuthSession = {
+  username: string;
+  loggedIn: boolean;
+};
+
+const AUTH_STORAGE_KEY = "vocab-auth-session";
+const AUTH_EVENT_NAME = "vocab-auth-change";
+
 const NAV_ITEMS = [
   { id: "info", label: "i", ariaLabel: "Info" },
   { id: "karteikasten", label: "Karteikasten", ariaLabel: "Karteikasten" },
   { id: "selbstlernen", label: "Selbstlernen", ariaLabel: "Selbstlernen" },
   { id: "abfragen", label: "Abfragen", ariaLabel: "Abfragen" }
 ] as const;
+
+const readSession = (): AuthSession | null => {
+  const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
+  if (!raw) return null;
+
+  try {
+    const session = JSON.parse(raw) as AuthSession;
+    return session.loggedIn ? session : null;
+  } catch {
+    return null;
+  }
+};
+
+const getCurrentNavId = (): string => {
+  const path = window.location.pathname;
+
+  if (path.startsWith("/selfstudy")) return "selbstlernen";
+  if (path.startsWith("/abfrage")) return "abfragen";
+  if (path.startsWith("/anmeldung")) return "anmeldung";
+  if (path === "/") return readSession() ? "karteikasten" : "anmeldung";
+  return "karteikasten";
+};
 
 const createGearIcon = (): SVGSVGElement => {
   const ns = "http://www.w3.org/2000/svg";
@@ -74,6 +104,12 @@ export const mountFloatingNavBar = (
         return;
       }
 
+      if (!readSession()) {
+        setActiveButton("anmeldung");
+        window.location.assign("/anmeldung");
+        return;
+      }
+
       setActiveButton(item.id);
       onNavigate(item.id);
     });
@@ -81,11 +117,51 @@ export const mountFloatingNavBar = (
     li.append(button);
     list.append(li);
     buttons.set(item.id, button);
-
-    if (item.id === "karteikasten") {
-      setActiveButton(item.id);
-    }
   });
+
+  const authLi = document.createElement("li");
+  authLi.className = "vocab-nav__item vocab-nav__item--auth";
+
+  const authButton = document.createElement("button");
+  authButton.type = "button";
+  authButton.className = "vocab-nav__button vocab-nav__button--auth";
+  authButton.dataset.navId = "anmeldung";
+
+  const updateAuthButton = (): void => {
+    const session = readSession();
+    const isLoggedIn = session !== null;
+
+    authButton.textContent = isLoggedIn ? "Logout" : "Login";
+    authButton.setAttribute(
+      "aria-label",
+      isLoggedIn ? `Abmelden von ${session.username}` : "Zur Anmeldung"
+    );
+    authButton.classList.toggle("is-logout", isLoggedIn);
+  };
+
+  const handleAuthChange = (): void => {
+    updateAuthButton();
+  };
+
+  authButton.addEventListener("click", () => {
+    const session = readSession();
+
+    if (session) {
+      window.localStorage.removeItem(AUTH_STORAGE_KEY);
+      window.dispatchEvent(new CustomEvent(AUTH_EVENT_NAME));
+    }
+
+    setActiveButton("anmeldung");
+    window.location.assign("/anmeldung");
+  });
+
+  updateAuthButton();
+  window.addEventListener("storage", handleAuthChange);
+  window.addEventListener(AUTH_EVENT_NAME, handleAuthChange);
+
+  authLi.append(authButton);
+  list.append(authLi);
+  buttons.set("anmeldung", authButton);
 
   const settingsLi = document.createElement("li");
   settingsLi.className = "vocab-nav__item";
@@ -102,9 +178,12 @@ export const mountFloatingNavBar = (
 
   nav.append(list);
   mount.append(nav);
+  setActiveButton(getCurrentNavId());
 
   return {
     destroy: () => {
+      window.removeEventListener("storage", handleAuthChange);
+      window.removeEventListener(AUTH_EVENT_NAME, handleAuthChange);
       nav.remove();
     },
     getInfoButton: () => buttons.get("info") as HTMLButtonElement,
