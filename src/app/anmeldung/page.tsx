@@ -3,6 +3,8 @@
 import styles from "../styles/anmeldung-styles/container.module.css";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
+import { DEMO_DEFAULT_SETTINGS } from "@/components/navbar-data/demoData";
+import { updateSettings } from "@/lib/api/settings";
 
 type FormMode = "login" | "register";
 
@@ -31,16 +33,8 @@ type AuthSession = {
   createdAt: string;
 };
 
-type StoredSettings = {
-  account?: {
-    username?: string;
-    email?: string;
-  };
-};
-
 const AUTH_STORAGE_KEY = "vocab-auth-session";
 const USERS_STORAGE_KEY = "vocab-users";
-const SETTINGS_STORAGE_KEY = "vocab-app-settings";
 const AUTH_EVENT_NAME = "vocab-auth-change";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DEMO_USER: StoredUser = {
@@ -61,17 +55,6 @@ const createUserId = (email: string): string => {
 };
 
 const normalizeEmail = (email: string): string => email.trim().toLowerCase();
-
-const readStoredSettings = (): StoredSettings => {
-  const raw = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
-  if (!raw) return {};
-
-  try {
-    return JSON.parse(raw) as StoredSettings;
-  } catch {
-    return {};
-  }
-};
 
 const readUsers = (): StoredUser[] => {
   const raw = window.localStorage.getItem(USERS_STORAGE_KEY);
@@ -112,7 +95,7 @@ const readSession = (): AuthSession | null => {
   }
 };
 
-const saveLogin = (user: StoredUser): AuthSession => {
+const saveLogin = async (user: StoredUser): Promise<AuthSession> => {
   const session: AuthSession = {
     username: user.username,
     email: normalizeEmail(user.email),
@@ -121,18 +104,15 @@ const saveLogin = (user: StoredUser): AuthSession => {
     createdAt: new Date().toISOString()
   };
 
-  const currentSettings = readStoredSettings();
-  const nextSettings: StoredSettings = {
-    ...currentSettings,
+  await updateSettings({
+    ...DEMO_DEFAULT_SETTINGS,
     account: {
-      ...currentSettings.account,
       username: session.username,
       email: session.email
     }
-  };
+  });
 
   window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
-  window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(nextSettings));
   window.dispatchEvent(new CustomEvent(AUTH_EVENT_NAME, { detail: session }));
 
   return session;
@@ -202,7 +182,7 @@ export default function Anmeldung() {
     return nextErrors;
   };
 
-  const handleLogin = (): void => {
+  const handleLogin = async (): Promise<void> => {
     const usernameValue = form.username.trim();
     const emailValue = normalizeEmail(form.email);
     const user = readUsers().find(
@@ -217,11 +197,11 @@ export default function Anmeldung() {
       return;
     }
 
-    saveLogin(user);
+    await saveLogin(user);
     router.push("/overview");
   };
 
-  const handleRegister = (): void => {
+  const handleRegister = async (): Promise<void> => {
     const usernameValue = form.username.trim();
     const emailValue = normalizeEmail(form.email);
     const users = readUsers();
@@ -241,11 +221,11 @@ export default function Anmeldung() {
     };
 
     saveUsers([...users, newUser]);
-    saveLogin(newUser);
+    await saveLogin(newUser);
     router.push("/overview");
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     resetMessages();
 
@@ -259,9 +239,9 @@ export default function Anmeldung() {
     setIsSubmitting(true);
     try {
       if (mode === "login") {
-        handleLogin();
+        await handleLogin();
       } else {
-        handleRegister();
+        await handleRegister();
       }
     } catch {
       setGeneralError("Die Daten konnten nicht gespeichert werden.");

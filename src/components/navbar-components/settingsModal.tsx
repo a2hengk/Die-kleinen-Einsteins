@@ -1,5 +1,9 @@
 import { DEMO_DEFAULT_SETTINGS } from "../navbar-data/demoData";
 import type { AppSettings } from "../types/settings";
+import {
+  fetchSettings,
+  updateSettings as saveSettingsToApi
+} from "@/lib/api/settings";
 import { createManagedModal } from "./modalUtils";
 
 export interface SettingsModalOptions {
@@ -35,18 +39,10 @@ type AuthSession = {
   createdAt?: string;
 };
 
-type StoredSettings = {
-  account?: Partial<AppSettings["account"]>;
-  ui?: Partial<AppSettings["ui"]>;
-  trainer?: Partial<AppSettings["trainer"]>;
-  accessibility?: Partial<AppSettings["accessibility"]>;
-};
-
 const THEME_QUERY = "(prefers-color-scheme: dark)";
 const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const AUTH_STORAGE_KEY = "vocab-auth-session";
-const SETTINGS_STORAGE_KEY = "vocab-app-settings";
 const AUTH_EVENT_NAME = "vocab-auth-change";
 
 const clone = (settings: AppSettings): AppSettings => ({
@@ -97,45 +93,12 @@ const readAuthSession = (): AuthSession | null => {
   }
 };
 
-const readStoredSettings = (): StoredSettings => {
-  const raw = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
-  if (!raw) return {};
-
-  try {
-    return JSON.parse(raw) as StoredSettings;
-  } catch {
-    return {};
-  }
-};
-
 const read = (): AppSettings => {
   const base = clone(DEMO_DEFAULT_SETTINGS);
-  const stored = readStoredSettings();
   const session = readAuthSession();
 
   base.ui.theme = preferredTheme();
   base.accessibility.reducedMotion = preferredReducedMotion();
-
-  if (stored.account?.username) base.account.username = stored.account.username;
-  if (stored.account?.email) base.account.email = stored.account.email;
-  if (stored.ui?.theme === "dark" || stored.ui?.theme === "light") {
-    base.ui.theme = stored.ui.theme;
-  }
-  if (typeof stored.trainer?.audioOnCorrect === "boolean") {
-    base.trainer.audioOnCorrect = stored.trainer.audioOnCorrect;
-  }
-  if (typeof stored.trainer?.autoFocusInput === "boolean") {
-    base.trainer.autoFocusInput = stored.trainer.autoFocusInput;
-  }
-  if (typeof stored.accessibility?.largeText === "boolean") {
-    base.accessibility.largeText = stored.accessibility.largeText;
-  }
-  if (typeof stored.accessibility?.reducedMotion === "boolean") {
-    base.accessibility.reducedMotion = stored.accessibility.reducedMotion;
-  }
-  if (typeof stored.accessibility?.highContrast === "boolean") {
-    base.accessibility.highContrast = stored.accessibility.highContrast;
-  }
 
   if (session) {
     base.account.username = session.username;
@@ -145,21 +108,18 @@ const read = (): AppSettings => {
   return base;
 };
 
-const saveSettings = (settings: AppSettings): void => {
-  window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
-
+const syncSessionWithSettings = (settings: AppSettings): void => {
   const session = readAuthSession();
-  if (session) {
-    const nextSession: AuthSession = {
-      ...session,
-      username: settings.account.username,
-      email: settings.account.email,
-      userId: createUserId(settings.account.email)
-    };
+  if (!session) return;
 
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(nextSession));
-  }
+  const nextSession: AuthSession = {
+    ...session,
+    username: settings.account.username,
+    email: settings.account.email,
+    userId: createUserId(settings.account.email)
+  };
 
+  window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(nextSession));
   window.dispatchEvent(new CustomEvent(AUTH_EVENT_NAME, { detail: settings }));
 };
 
@@ -554,6 +514,19 @@ export const createSettingsModal = (
     resetFormState();
     updateTimer();
     modal.open();
+    fetchSettings()
+      .then((savedSettings) => {
+        replaceState(savedSettings);
+        syncSessionWithSettings(savedSettings);
+        syncFormWithState();
+        applyPreferences(state);
+        notify();
+      })
+      .catch(() => {
+        toast.hidden = false;
+        toast.textContent = "Einstellungen konnten nicht geladen werden.";
+        toast.classList.add("vocab-settings__toast--error");
+      });
   };
 
   updateTimer();
@@ -572,7 +545,7 @@ export const createSettingsModal = (
     window.location.assign("/anmeldung");
   });
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearErrors();
 
@@ -628,7 +601,9 @@ export const createSettingsModal = (
 
     save.disabled = true;
     try {
-      saveSettings(state);
+      const savedSettings = await saveSettingsToApi(state);
+      replaceState(savedSettings);
+      syncSessionWithSettings(savedSettings);
       applyPreferences(state);
       syncFormWithState();
       toast.hidden = false;

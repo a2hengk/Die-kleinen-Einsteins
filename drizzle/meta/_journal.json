@@ -15,6 +15,13 @@
       "when": 1783974718093,
       "tag": "0001_fair_nocturne",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784748597390,
+      "tag": "0002_overjoyed_the_hand",
+      "breakpoints": true
     }
   ]
 }
