@@ -4,6 +4,7 @@ import stylesContainer from '../styles/selfstudy-styles/container.module.css';
 import StatusBar from '../../components/ui/statusbar/statusbar';
 import { Button } from '../../components/ui/button/button';
 import { fetchCards } from '@/lib/api/cards';
+import { fetchCurrentUser } from '@/lib/api/auth';
 import { recordAnswer } from '@/lib/api/progress';
 import type { Flashcard } from '@/lib/types';
 import { useRouter } from 'next/navigation';
@@ -31,8 +32,17 @@ export default function SelfStudy() {
     const currentCard = hasCards ? cards[currentIndex] : null;
 
     useEffect(() => {
-        fetchCards().then(setCards).catch(() => setCards([]));
-    }, []);
+        fetchCurrentUser()
+            .then((user) => {
+                if (!user) {
+                    router.replace("/anmeldung");
+                    return;
+                }
+
+                fetchCards().then(setCards).catch(() => setCards([]));
+            })
+            .catch(() => router.replace("/anmeldung"));
+    }, [router]);
 
     useEffect(() => {
         if (currentIndex < cards.length) {
@@ -43,7 +53,10 @@ export default function SelfStudy() {
     }, [cards.length, currentIndex]);
 
 
-    // Navbar setup
+    
+    // Navbar initialisieren
+    // Wurde Händisch in overview/page.tsx programmiert und dann von der KI zu selfstudy/page.tsx und abfrage/page.tsx übernommen.
+    
 
     useEffect(() => {
         if (!navMountRef.current) {

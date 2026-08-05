@@ -1,3 +1,9 @@
+import {
+  fetchCurrentUser,
+  logout,
+  type AuthUser
+} from "@/lib/api/auth";
+
 export interface MountFloatingNavBarOptions {
   mount: HTMLElement;
   onNavigate: (itemId: string) => void;
@@ -11,12 +17,6 @@ export interface FloatingNavBarController {
   getSettingsButton: () => HTMLButtonElement;
 }
 
-type AuthSession = {
-  username: string;
-  loggedIn: boolean;
-};
-
-const AUTH_STORAGE_KEY = "vocab-auth-session";
 const AUTH_EVENT_NAME = "vocab-auth-change";
 
 const NAV_ITEMS = [
@@ -26,28 +26,17 @@ const NAV_ITEMS = [
   { id: "abfragen", label: "Abfragen", ariaLabel: "Abfragen" }
 ] as const;
 
-const readSession = (): AuthSession | null => {
-  const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
-  if (!raw) return null;
-
-  try {
-    const session = JSON.parse(raw) as AuthSession;
-    return session.loggedIn ? session : null;
-  } catch {
-    return null;
-  }
-};
-
 const getCurrentNavId = (): string => {
   const path = window.location.pathname;
 
   if (path.startsWith("/selfstudy")) return "selbstlernen";
   if (path.startsWith("/abfrage")) return "abfragen";
   if (path.startsWith("/anmeldung")) return "anmeldung";
-  if (path === "/") return readSession() ? "karteikasten" : "anmeldung";
+  if (path === "/") return "anmeldung";
   return "karteikasten";
 };
 
+// Zahnrad wurde mit Hilfe von KI hergestellt
 const createGearIcon = (): SVGSVGElement => {
   const ns = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(ns, "svg");
@@ -69,6 +58,7 @@ export const mountFloatingNavBar = (
   options: MountFloatingNavBarOptions
 ): FloatingNavBarController => {
   const { mount, onNavigate, onOpenInfo, onOpenSettings } = options;
+  let currentUser: AuthUser | null = null;
 
   const nav = document.createElement("nav");
   nav.className = "vocab-nav";
@@ -98,13 +88,14 @@ export const mountFloatingNavBar = (
     button.dataset.navId = item.id;
     button.setAttribute("aria-label", item.ariaLabel);
 
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       if (item.id === "info") {
         onOpenInfo();
         return;
       }
 
-      if (!readSession()) {
+      currentUser = await fetchCurrentUser().catch(() => null);
+      if (!currentUser) {
         setActiveButton("anmeldung");
         window.location.assign("/anmeldung");
         return;
@@ -128,26 +119,25 @@ export const mountFloatingNavBar = (
   authButton.dataset.navId = "anmeldung";
 
   const updateAuthButton = (): void => {
-    const session = readSession();
-    const isLoggedIn = session !== null;
+    const isLoggedIn = currentUser !== null;
 
     authButton.textContent = isLoggedIn ? "Logout" : "Login";
     authButton.setAttribute(
       "aria-label",
-      isLoggedIn ? `Abmelden von ${session.username}` : "Zur Anmeldung"
+      currentUser ? `Abmelden von ${currentUser.username}` : "Zur Anmeldung"
     );
     authButton.classList.toggle("is-logout", isLoggedIn);
   };
 
-  const handleAuthChange = (): void => {
+  const handleAuthChange = async (): Promise<void> => {
+    currentUser = await fetchCurrentUser().catch(() => null);
     updateAuthButton();
   };
 
-  authButton.addEventListener("click", () => {
-    const session = readSession();
-
-    if (session) {
-      window.localStorage.removeItem(AUTH_STORAGE_KEY);
+  authButton.addEventListener("click", async () => {
+    if (currentUser) {
+      await logout().catch(() => {});
+      currentUser = null;
       window.dispatchEvent(new CustomEvent(AUTH_EVENT_NAME));
     }
 
@@ -156,7 +146,7 @@ export const mountFloatingNavBar = (
   });
 
   updateAuthButton();
-  window.addEventListener("storage", handleAuthChange);
+  handleAuthChange();
   window.addEventListener(AUTH_EVENT_NAME, handleAuthChange);
 
   authLi.append(authButton);
@@ -182,7 +172,6 @@ export const mountFloatingNavBar = (
 
   return {
     destroy: () => {
-      window.removeEventListener("storage", handleAuthChange);
       window.removeEventListener(AUTH_EVENT_NAME, handleAuthChange);
       nav.remove();
     },

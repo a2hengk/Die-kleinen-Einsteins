@@ -7,6 +7,7 @@ import styleContainer from "../styles/overview-styles/container.module.css";
 import { Button } from "@/components/ui/button/button";
 import Input from "@/components/ui/input/input";
 import { createCard, deleteCard, fetchCards, updateCard } from "@/lib/api/cards";
+import { fetchCurrentUser } from "@/lib/api/auth";
 import type { Flashcard } from "@/lib/types";
 
 // ─────────────────────────────────────────────
@@ -20,19 +21,6 @@ import { configureDialogTrigger } from "../../components/navbar-components/modal
 import { createSettingsModal } from "../../components/navbar-components/settingsModal";
 
 type Card = Flashcard;
-const AUTH_STORAGE_KEY = "vocab-auth-session";
-
-const isLoggedIn = (): boolean => {
-    const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
-    if (!raw) return false;
-
-    try {
-        const session = JSON.parse(raw) as { loggedIn?: boolean };
-        return session.loggedIn === true;
-    } catch {
-        return false;
-    }
-};
 
 export default function Overview() {
     const [cards, setCards] = useState<Card[]>([]);
@@ -52,17 +40,22 @@ export default function Overview() {
     const navMountRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        if (!isLoggedIn()) {
-            router.replace("/anmeldung");
-            return;
-        }
+        fetchCurrentUser()
+            .then((user) => {
+                if (!user) {
+                    router.replace("/anmeldung");
+                    return;
+                }
 
-        fetchCards().then(setCards).catch(() => setCards([]));
+                fetchCards().then(setCards).catch(() => setCards([]));
+            })
+            .catch(() => router.replace("/anmeldung"));
     }, [router]);
 
-    // ─────────────────────────────────────────────
-    // Navbar initialisieren (läuft einmalig beim ersten Rendern)
-    // ─────────────────────────────────────────────
+    
+    // Navbar initialisieren
+    // Wurde Händisch in overview/page.tsx programmiert und dann von der KI zu selfstudy/page.tsx und abfrage/page.tsx übernommen.
+    
     useEffect(() => {
         if (!navMountRef.current) return;
 

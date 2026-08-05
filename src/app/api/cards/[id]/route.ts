@@ -19,7 +19,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         return validationErrorResponse(result.error);
     }
 
-    const userId = getCurrentUserId();
+    const userId = await getCurrentUserId();
+    if (!userId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const card = await updateCard(userId, cardId, result.data);
     if (!card) {
         return NextResponse.json({ error: "Card not found" }, { status: 404 });
@@ -35,7 +39,11 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Invalid card id" }, { status: 400 });
     }
 
-    const userId = getCurrentUserId();
+    const userId = await getCurrentUserId();
+    if (!userId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const card = await deleteCard(userId, cardId);
     if (!card) {
         return NextResponse.json({ error: "Card not found" }, { status: 404 });

@@ -7,6 +7,7 @@ import { initialQuizData, initialQuizState } from "@/lib/constants";
 import { Action, QuizState } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { Result } from "@/components/abfrage/result";
+import { fetchCurrentUser } from "@/lib/api/auth";
 
 // import navbar
 import { useEffect, useRef, useState, useReducer } from "react";
@@ -58,6 +59,20 @@ export default function abfrage() {
   const navMountRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const currentQuestion = initialQuizData[state.currentIndex];
+
+  useEffect(() => {
+    fetchCurrentUser()
+      .then((user) => {
+        if (!user) router.replace("/anmeldung");
+      })
+      .catch(() => router.replace("/anmeldung"));
+  }, [router]);
+
+
+  
+  // Navbar initialisieren
+  // Wurde Händisch in overview/page.tsx programmiert und dann von der KI zu selfstudy/page.tsx und abfrage/page.tsx übernommen.
+  
 
   useEffect(() => {
     if (!navMountRef.current) {

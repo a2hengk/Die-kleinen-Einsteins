@@ -48,6 +48,16 @@ export async function getSettingsForUser(userId: string) {
     return settings ? toAppSettings(settings) : null;
 }
 
+export async function getSettingsByEmail(email: string) {
+    const [settings] = await db
+        .select()
+        .from(appSettings)
+        .where(eq(appSettings.email, email))
+        .limit(1);
+
+    return settings;
+}
+
 export async function createSettings(userId: string, settings: AppSettings) {
     const [created] = await db
         .insert(appSettings)

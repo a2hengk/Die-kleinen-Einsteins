@@ -8,9 +8,19 @@ import {
     unique,
 } from "drizzle-orm/pg-core";
 
+export const users = pgTable("users", {
+    id: text("id").primaryKey(),
+    username: text("username").notNull().unique(),
+    password: text("password").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const cards = pgTable("cards", {
     id: serial("id").primaryKey(),
-    userId: text("user_id").notNull(),
+    userId: text("user_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
     front: text("front").notNull(),
     back: text("back").notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -21,7 +31,9 @@ export const cardProgress = pgTable(
     "card_progress",
     {
         id: serial("id").primaryKey(),
-        userId: text("user_id").notNull(),
+        userId: text("user_id")
+            .notNull()
+            .references(() => users.id, { onDelete: "cascade" }),
         cardId: integer("card_id")
             .notNull()
             .references(() => cards.id, { onDelete: "cascade" }),
@@ -36,7 +48,9 @@ export const appSettings = pgTable(
     "app_settings",
     {
         id: serial("id").primaryKey(),
-        userId: text("user_id").notNull(),
+        userId: text("user_id")
+            .notNull()
+            .references(() => users.id, { onDelete: "cascade" }),
         username: text("username").notNull(),
         email: text("email").notNull(),
         theme: text("theme").notNull().default("light"),
@@ -55,3 +69,4 @@ export type Card = typeof cards.$inferSelect;
 export type NewCard = typeof cards.$inferInsert;
 export type CardProgress = typeof cardProgress.$inferSelect;
 export type AppSettingsRow = typeof appSettings.$inferSelect;
+export type User = typeof users.$inferSelect;

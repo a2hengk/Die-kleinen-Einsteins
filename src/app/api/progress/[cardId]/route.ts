@@ -20,7 +20,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         return validationErrorResponse(result.error);
     }
 
-    const userId = getCurrentUserId();
+    const userId = await getCurrentUserId();
+    if (!userId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const card = await getCardForUser(userId, cardId);
     if (!card) {
         return NextResponse.json({ error: "Card not found" }, { status: 404 });

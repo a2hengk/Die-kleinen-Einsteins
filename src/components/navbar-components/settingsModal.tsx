@@ -4,6 +4,12 @@ import {
   fetchSettings,
   updateSettings as saveSettingsToApi
 } from "@/lib/api/settings";
+import {
+  changePassword,
+  fetchCurrentUser,
+  logout as logoutUser,
+  type AuthUser
+} from "@/lib/api/auth";
 import { createManagedModal } from "./modalUtils";
 
 export interface SettingsModalOptions {
@@ -31,18 +37,9 @@ type ToggleField = {
   input: HTMLInputElement;
 };
 
-type AuthSession = {
-  username: string;
-  email: string;
-  userId?: string;
-  loggedIn: boolean;
-  createdAt?: string;
-};
-
 const THEME_QUERY = "(prefers-color-scheme: dark)";
 const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const AUTH_STORAGE_KEY = "vocab-auth-session";
 const AUTH_EVENT_NAME = "vocab-auth-change";
 
 const clone = (settings: AppSettings): AppSettings => ({
@@ -58,15 +55,6 @@ const preferredTheme = (): "light" | "dark" =>
 const preferredReducedMotion = (): boolean =>
   window.matchMedia(MOTION_QUERY).matches;
 
-const createUserId = (email: string): string => {
-  const emailName = email
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-
-  return `user-${emailName || "guest"}`;
-};
-
 const applyPreferences = (settings: AppSettings): void => {
   const root = document.documentElement;
   root.setAttribute("data-theme", settings.ui.theme);
@@ -81,45 +69,16 @@ const applyPreferences = (settings: AppSettings): void => {
   );
 };
 
-const readAuthSession = (): AuthSession | null => {
-  const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
-  if (!raw) return null;
-
-  try {
-    const session = JSON.parse(raw) as AuthSession;
-    return session.loggedIn ? session : null;
-  } catch {
-    return null;
-  }
-};
-
 const read = (): AppSettings => {
   const base = clone(DEMO_DEFAULT_SETTINGS);
-  const session = readAuthSession();
 
   base.ui.theme = preferredTheme();
   base.accessibility.reducedMotion = preferredReducedMotion();
 
-  if (session) {
-    base.account.username = session.username;
-    base.account.email = session.email;
-  }
-
   return base;
 };
 
-const syncSessionWithSettings = (settings: AppSettings): void => {
-  const session = readAuthSession();
-  if (!session) return;
-
-  const nextSession: AuthSession = {
-    ...session,
-    username: settings.account.username,
-    email: settings.account.email,
-    userId: createUserId(settings.account.email)
-  };
-
-  window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(nextSession));
+const notifyAuthChange = (settings?: AppSettings): void => {
   window.dispatchEvent(new CustomEvent(AUTH_EVENT_NAME, { detail: settings }));
 };
 
@@ -284,6 +243,7 @@ export const createSettingsModal = (
 ): SettingsModalController => {
   const startedAt = Date.now();
   const state = read();
+  let currentUser: AuthUser | null = null;
   applyPreferences(state);
 
   const listeners = new Set<(settings: AppSettings) => void>();
@@ -466,8 +426,6 @@ export const createSettingsModal = (
   };
 
   const syncFormWithState = (): void => {
-    const session = readAuthSession();
-
     username.input.value = state.account.username;
     email.input.value = state.account.email;
     darkMode.input.checked = state.ui.theme === "dark";
@@ -476,10 +434,10 @@ export const createSettingsModal = (
     largeText.input.checked = state.accessibility.largeText;
     reducedMotion.input.checked = state.accessibility.reducedMotion;
     highContrast.input.checked = state.accessibility.highContrast;
-    authStatus.textContent = session
-      ? `Angemeldet als ${session.username}`
+    authStatus.textContent = currentUser
+      ? `Angemeldet als ${currentUser.username}`
       : "Nicht angemeldet.";
-    logout.hidden = session === null;
+    logout.hidden = currentUser === null;
     clearPasswordInputs();
   };
 
@@ -514,10 +472,10 @@ export const createSettingsModal = (
     resetFormState();
     updateTimer();
     modal.open();
-    fetchSettings()
-      .then((savedSettings) => {
+    Promise.all([fetchSettings(), fetchCurrentUser()])
+      .then(([savedSettings, user]) => {
+        currentUser = user;
         replaceState(savedSettings);
-        syncSessionWithSettings(savedSettings);
         syncFormWithState();
         applyPreferences(state);
         notify();
@@ -536,9 +494,10 @@ export const createSettingsModal = (
     input.addEventListener("change", applyPreviewState);
   });
 
-  logout.addEventListener("click", () => {
-    window.localStorage.removeItem(AUTH_STORAGE_KEY);
-    window.dispatchEvent(new CustomEvent(AUTH_EVENT_NAME));
+  logout.addEventListener("click", async () => {
+    await logoutUser().catch(() => {});
+    currentUser = null;
+    notifyAuthChange();
     replaceState(read());
     resetFormState();
     modal.close();
@@ -601,9 +560,14 @@ export const createSettingsModal = (
 
     save.disabled = true;
     try {
+      if (hasPasswordInput) {
+        await changePassword(currentPw.input.value, newPw.input.value);
+      }
+
       const savedSettings = await saveSettingsToApi(state);
       replaceState(savedSettings);
-      syncSessionWithSettings(savedSettings);
+      currentUser = await fetchCurrentUser();
+      notifyAuthChange(savedSettings);
       applyPreferences(state);
       syncFormWithState();
       toast.hidden = false;
