@@ -1,3 +1,8 @@
+/*
+    Die Einträge von Lightmode ohne Kontrast wurden von Hand geschrieben, die Einträge von "[data-theme="dark"]", 
+    "[data-high-contrast="true"]" und "[data-theme="dark"][data-high-contrast="true"]" wurden von der KI mit Vorgegebenen Farben generiert
+*/
+
 :root {
   --bg: #f5efe6;
   --bg-accent: #e9d8c4;
