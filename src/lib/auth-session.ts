@@ -45,9 +45,13 @@ export async function getSessionUserId(): Promise<string | null> {
 
 export async function createSession(userId: string): Promise<void> {
     const cookieStore = await cookies();
+    const secureCookie = process.env.AUTH_COOKIE_SECURE
+        ? process.env.AUTH_COOKIE_SECURE === "true"
+        : process.env.NODE_ENV === "production";
+
     cookieStore.set(SESSION_COOKIE_NAME, createSessionToken(userId), {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: secureCookie,
         sameSite: "lax",
         maxAge: SESSION_MAX_AGE,
         path: "/",

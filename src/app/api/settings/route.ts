@@ -5,7 +5,11 @@ import {
     getSettingsForUser,
     updateSettings,
 } from "@/db/queries/settings";
-import { getUserByUsername, updateUsername } from "@/db/queries/users";
+import {
+    getUserById,
+    getUserByUsername,
+    updateUsername,
+} from "@/db/queries/users";
 import {
     defaultAppSettings,
     mergeSettings,
@@ -20,8 +24,22 @@ export async function GET() {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const settings = await getSettingsForUser(userId);
-    return NextResponse.json(settings ?? defaultAppSettings);
+    const [settings, user] = await Promise.all([
+        getSettingsForUser(userId),
+        getUserById(userId),
+    ]);
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const result = settings ?? defaultAppSettings;
+    return NextResponse.json({
+        ...result,
+        account: {
+            ...result.account,
+            username: user.username,
+        },
+    });
 }
 
 export async function POST(request: NextRequest) {
@@ -69,7 +87,22 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const current = (await getSettingsForUser(userId)) ?? defaultAppSettings;
+    const [storedSettings, user] = await Promise.all([
+        getSettingsForUser(userId),
+        getUserById(userId),
+    ]);
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const stored = storedSettings ?? defaultAppSettings;
+    const current = {
+        ...stored,
+        account: {
+            ...stored.account,
+            username: user.username,
+        },
+    };
     const nextSettings = mergeSettings(current, result.data);
     const usernameOwner = await getUserByUsername(nextSettings.account.username);
     if (usernameOwner && usernameOwner.id !== userId) {

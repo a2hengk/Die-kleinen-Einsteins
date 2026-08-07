@@ -136,7 +136,7 @@ button {
   z-index: 40;
 }
 
-.vocab-nav_list {
+.vocab-nav__list {
   list-style: none;
   display: flex;
   justify-content: center;

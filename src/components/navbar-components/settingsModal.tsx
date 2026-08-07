@@ -82,6 +82,11 @@ const notifyAuthChange = (settings?: AppSettings): void => {
   window.dispatchEvent(new CustomEvent(AUTH_EVENT_NAME, { detail: settings }));
 };
 
+const errorText = (fallback: string, error: unknown): string =>
+  error instanceof Error && error.message
+    ? `${fallback}: ${error.message}`
+    : fallback;
+
 const formatElapsed = (startedAt: number): string => {
   const seconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
   const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
@@ -244,6 +249,8 @@ export const createSettingsModal = (
   const startedAt = Date.now();
   const state = read();
   let currentUser: AuthUser | null = null;
+  let loadGeneration = 0;
+  let destroyed = false;
   applyPreferences(state);
 
   const listeners = new Set<(settings: AppSettings) => void>();
@@ -467,26 +474,42 @@ export const createSettingsModal = (
     applyPreferences(state);
   };
 
-  const open = (): void => {
-    replaceState(read());
-    resetFormState();
-    updateTimer();
-    modal.open();
+  const loadPersistedSettings = (): void => {
+    const generation = ++loadGeneration;
+
     Promise.all([fetchSettings(), fetchCurrentUser()])
       .then(([savedSettings, user]) => {
+        if (destroyed || generation !== loadGeneration) return;
+
         currentUser = user;
         replaceState(savedSettings);
         syncFormWithState();
         applyPreferences(state);
         notify();
       })
-      .catch(() => {
+      .catch((error: unknown) => {
+        if (destroyed || generation !== loadGeneration) return;
+
         toast.hidden = false;
-        toast.textContent = "Einstellungen konnten nicht geladen werden.";
+        toast.textContent = errorText(
+          "Einstellungen konnten nicht geladen werden",
+          error
+        );
         toast.classList.add("vocab-settings__toast--error");
       });
   };
 
+  const open = (): void => {
+    replaceState(read());
+    resetFormState();
+    updateTimer();
+    modal.open();
+    loadPersistedSettings();
+  };
+
+  // Apply saved preferences whenever a page creates the shared navbar/modal,
+  // not only after the user opens the settings dialog.
+  loadPersistedSettings();
   updateTimer();
   const timerId = window.setInterval(updateTimer, 1000);
 
@@ -539,6 +562,8 @@ export const createSettingsModal = (
       return;
     }
 
+    // A pending page-initialization request must not overwrite newer form data.
+    loadGeneration += 1;
     replaceState({
       account: {
         username: usernameValue,
@@ -573,9 +598,12 @@ export const createSettingsModal = (
       toast.hidden = false;
       toast.textContent = "Einstellungen gespeichert.";
       notify();
-    } catch {
+    } catch (error: unknown) {
       toast.hidden = false;
-      toast.textContent = "Einstellungen konnten nicht gespeichert werden.";
+      toast.textContent = errorText(
+        "Einstellungen konnten nicht gespeichert werden",
+        error
+      );
       toast.classList.add("vocab-settings__toast--error");
     } finally {
       save.disabled = false;
@@ -611,6 +639,8 @@ export const createSettingsModal = (
       };
     },
     destroy: () => {
+      destroyed = true;
+      loadGeneration += 1;
       if (timerId !== null) window.clearInterval(timerId);
       themeMedia.removeEventListener("change", handleThemeChange);
       motionMedia.removeEventListener("change", handleMotionChange);
